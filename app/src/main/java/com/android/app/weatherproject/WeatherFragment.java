@@ -17,15 +17,18 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
+import java.util.ArrayList;
 
-/**
- * A simple {@link Fragment} subclass.
- */
 public class WeatherFragment extends Fragment {
 
     // Root of the layout of fragment
     private View mLayout;
+
+    // The array adapter to be used to fetch the data in UI
+    ArrayAdapter<String> mWeatherAdapter;
 
     // Tag for logging reasons
     private static final String LOG_TAG = WeatherFragment.class.getSimpleName();
@@ -37,6 +40,10 @@ public class WeatherFragment extends Fragment {
         // Required empty public constructor
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -61,14 +68,22 @@ public class WeatherFragment extends Fragment {
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
         }
 
+        // Utilize a cached location until the listener receive a more accurate position
         Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         String lat = String.valueOf(lastKnownLocation.getLatitude());
         String lon = String.valueOf(lastKnownLocation.getLongitude());
         Log.i(LOG_TAG, "The latitute is" + lat);
         Log.i(LOG_TAG, "The longitute is" + lon);
 
-        GetWeatherData getWeatherData = new GetWeatherData();
+        ListView weatherList = (ListView) fragmentView.findViewById(R.id.listView_weather);
+
+        mWeatherAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item_forecast,
+                R.id.forecast_textView, new ArrayList<String>());
+
+        GetWeatherData getWeatherData = new GetWeatherData(getActivity(), mWeatherAdapter);
         getWeatherData.execute(lat, lon);
+
+        weatherList.setAdapter(mWeatherAdapter);
 
         return fragmentView;
     }

@@ -1,8 +1,14 @@
 package com.android.app.weatherproject;
 
+import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.ArrayAdapter;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,14 +16,24 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
-public class GetWeatherData extends AsyncTask<String, Void, Void> {
+public class GetWeatherData extends AsyncTask<String, Void, String[]> {
 
     // Tag for logging reasons
     private static final String LOG_TAG = GetWeatherData.class.getSimpleName();
 
+    private ArrayAdapter<String> mWeatherAdapter;
+    private final Context mContext;
+
+    public GetWeatherData(Context context, ArrayAdapter<String> weatherAdapter) {
+        mContext = context;
+        mWeatherAdapter = weatherAdapter;
+    }
+
     @Override
-    protected Void doInBackground(String... objects) {
+    protected String[] doInBackground(String... objects) {
 
         // If there's no coordinates, there's nothing to do
         if (objects.length == 0) {
@@ -57,8 +73,6 @@ public class GetWeatherData extends AsyncTask<String, Void, Void> {
             URL url = new URL(builtUri.toString());
             Log.v(LOG_TAG, "The constructed URL is " + url);
 
-
-
             // Create the request and open the connection
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
@@ -68,7 +82,7 @@ public class GetWeatherData extends AsyncTask<String, Void, Void> {
             // Check if the request was successful and if it was read the input stream
             if (urlConnection.getResponseCode() == 200) {
                 InputStream inputStream = urlConnection.getInputStream();
-                StringBuffer buffer = new StringBuffer();
+                StringBuilder builder = new StringBuilder();
                 if (inputStream == null) {
                     return null;
                 }
@@ -77,16 +91,16 @@ public class GetWeatherData extends AsyncTask<String, Void, Void> {
 
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    buffer.append(line);
+                    builder.append(line);
                 }
 
                 // Check if stream was empty and return
-                if (buffer.length() == 0) {
+                if (builder.length() == 0) {
                     return null;
                 }
 
-                weatherJsonString = buffer.toString();
-                Log.i(LOG_TAG, "The weather JSON data is here " + weatherJsonString);
+                weatherJsonString = builder.toString();
+                Log.v(LOG_TAG, "The weather JSON data is here " + weatherJsonString);
             }
         } catch (IOException e) {
 
@@ -105,6 +119,105 @@ public class GetWeatherData extends AsyncTask<String, Void, Void> {
                 }
             }
         }
+        try {
+            return getDataFromJson(weatherJsonString);
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
+            e.printStackTrace();
+        }
+        // If there was an error parsing the Json response return null
         return null;
+    }
+
+    @Override
+    protected void onPostExecute(String[] results) {
+            if (results != null && mWeatherAdapter != null) {
+
+                Log.v(LOG_TAG, "ON POST EXECUTE CALLED");
+                mWeatherAdapter.clear();
+                for (String weatherForecast : results) {
+                    mWeatherAdapter.add(weatherForecast);
+                    Log.v(LOG_TAG, "ADDING LIST ITEMS TO ADAPTER");
+                }
+            }
+    }
+
+    private String[] getDataFromJson(String jsonForecast) throws JSONException {
+
+        final int ARRAY_LENGTH = 8;
+
+        // The names of the Json object that will be extracted from the response
+        final String CURR_DAY = "currently";
+        final String TIME = "time";
+        final String SUMMARY = "summary";
+        final String ICON = "icon";
+        final String TEMPERATURE = "temperature";
+        final String DAILY = "daily";
+        final String DATA = "data";
+        final String MIN_TEMP = "temperatureMin";
+        final String MAX_TEMP = "temperatureMax";
+
+        JSONObject weatherForecast = new JSONObject(jsonForecast);
+        JSONObject currentWeather = weatherForecast.getJSONObject(CURR_DAY);
+        long time;
+        String todaySummary, todayIcon, todayFormattedTime;
+        double todayTemp;
+
+        time = currentWeather.getLong(TIME);
+        time *= 1000L;
+        todayFormattedTime = getDate(time);
+
+        todaySummary = currentWeather.getString(SUMMARY);
+        todayIcon = currentWeather.getString(ICON);
+        todayTemp = currentWeather.getDouble(TEMPERATURE);
+
+        JSONObject dailyWeather = weatherForecast.getJSONObject(DAILY);
+        JSONArray arrayDaily = dailyWeather.getJSONArray(DATA);
+
+        String[] results = new String[ARRAY_LENGTH];
+        for (int i =0; i <arrayDaily.length(); i ++) {
+            long timeDaily;
+            String day, summaryDaily, iconDaily;
+            double minTempDaily, maxTempDaily;
+
+            JSONObject dayWeather = arrayDaily.getJSONObject(i);
+
+            timeDaily = dayWeather.getLong(TIME);
+            timeDaily *= 1000L;
+            day = getDate(timeDaily);
+
+            summaryDaily = dayWeather.getString(SUMMARY);
+            iconDaily = dayWeather.getString(ICON);
+            minTempDaily = dayWeather.getDouble(MIN_TEMP);
+            maxTempDaily = dayWeather.getDouble(MAX_TEMP);
+
+            results[0] = todayFormattedTime + " - " + todaySummary + " - " + todayIcon + " - " + todayTemp;
+
+            results[i] = day + " - " + summaryDaily + " - "
+                    + minTempDaily + " , " + maxTempDaily;
+        }
+
+        for (String s : results) {
+            Log.v(LOG_TAG, "Forecast Entry: " + s);
+            Log.v(LOG_TAG, "The size of results is " + results.length);
+        }
+
+        return results;
+    }
+
+    /**
+     *
+     * @param timeInMilliseconds The time response from the API comes in milliseconds (UNIX time)
+     *                           and it must be converted
+     *
+     *
+     * @return The formatted date
+     */
+    private String getDate(long timeInMilliseconds) {
+
+        Date dateObject = new Date(timeInMilliseconds);
+
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("MMM DD, yyyy");
+        return dateFormatter.format(dateObject);
     }
 }
