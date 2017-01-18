@@ -131,7 +131,7 @@ public class GetWeatherData extends AsyncTask<String, Void, String[]> {
 
     @Override
     protected void onPostExecute(String[] results) {
-            if (results != null && mWeatherAdapter != null) {
+            if (results != null) {
 
                 Log.v(LOG_TAG, "ON POST EXECUTE CALLED");
                 mWeatherAdapter.clear();
@@ -156,12 +156,17 @@ public class GetWeatherData extends AsyncTask<String, Void, String[]> {
         final String DATA = "data";
         final String MIN_TEMP = "temperatureMin";
         final String MAX_TEMP = "temperatureMax";
+        final String LAT = "latitude";
+        final String LON = "longitude";
 
         JSONObject weatherForecast = new JSONObject(jsonForecast);
+
+        double locationLatitude = weatherForecast.getDouble(LAT);
+        double locationLongitude = weatherForecast.getDouble(LON);
+
         JSONObject currentWeather = weatherForecast.getJSONObject(CURR_DAY);
         long time;
         String todaySummary, todayIcon, todayFormattedTime;
-        double todayTemp;
 
         time = currentWeather.getLong(TIME);
         time *= 1000L;
@@ -169,7 +174,7 @@ public class GetWeatherData extends AsyncTask<String, Void, String[]> {
 
         todaySummary = currentWeather.getString(SUMMARY);
         todayIcon = currentWeather.getString(ICON);
-        todayTemp = currentWeather.getDouble(TEMPERATURE);
+        int todayTemperature = (int) Math.round(currentWeather.getDouble(TEMPERATURE));
 
         JSONObject dailyWeather = weatherForecast.getJSONObject(DAILY);
         JSONArray arrayDaily = dailyWeather.getJSONArray(DATA);
@@ -178,7 +183,7 @@ public class GetWeatherData extends AsyncTask<String, Void, String[]> {
         for (int i =0; i <arrayDaily.length(); i ++) {
             long timeDaily;
             String day, summaryDaily, iconDaily;
-            double minTempDaily, maxTempDaily;
+            int minTempDaily, maxTempDaily;
 
             JSONObject dayWeather = arrayDaily.getJSONObject(i);
 
@@ -188,10 +193,11 @@ public class GetWeatherData extends AsyncTask<String, Void, String[]> {
 
             summaryDaily = dayWeather.getString(SUMMARY);
             iconDaily = dayWeather.getString(ICON);
-            minTempDaily = dayWeather.getDouble(MIN_TEMP);
-            maxTempDaily = dayWeather.getDouble(MAX_TEMP);
 
-            results[0] = todayFormattedTime + " - " + todaySummary + " - " + todayIcon + " - " + todayTemp;
+            minTempDaily = (int) Math.round(dayWeather.getDouble(MIN_TEMP));
+            maxTempDaily = (int) Math.round(dayWeather.getDouble(MAX_TEMP));
+
+            results[0] = todayFormattedTime + " - " + todaySummary + " - " + todayIcon + " - " + todayTemperature;
 
             results[i] = day + " - " + summaryDaily + " - "
                     + minTempDaily + " , " + maxTempDaily;

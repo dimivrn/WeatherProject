@@ -9,6 +9,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -33,6 +34,8 @@ public class WeatherFragment extends Fragment {
     // Tag for logging reasons
     private static final String LOG_TAG = WeatherFragment.class.getSimpleName();
 
+    private LocationManager mLocationManager;
+
     // An app defined request constant. The callback method gets the result of the request
     final private int MY_REQUEST_ACCESS_COARSE_LOCATION = 100;
 
@@ -41,8 +44,10 @@ public class WeatherFragment extends Fragment {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mLocationManager = (LocationManager) getActivity()
+                .getSystemService(Context.LOCATION_SERVICE);
     }
 
     @Override
@@ -50,9 +55,6 @@ public class WeatherFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View fragmentView = inflater.inflate(R.layout.fragment_weather, container, false);
-
-        LocationManager locationManager = (LocationManager) getActivity()
-                .getSystemService(Context.LOCATION_SERVICE);
 
         // Check if the permission for location is granted by the user
         int permissionCheck = ContextCompat.checkSelfPermission(getActivity(),
@@ -65,11 +67,11 @@ public class WeatherFragment extends Fragment {
         } else {
             Log.v(LOG_TAG, "PERMISSION LOCATION IS GRANTED");
             // Register the listener with the Location Manager to receive location updates
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
         }
 
         // Utilize a cached location until the listener receive a more accurate position
-        Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        Location lastKnownLocation = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         String lat = String.valueOf(lastKnownLocation.getLatitude());
         String lon = String.valueOf(lastKnownLocation.getLongitude());
         Log.i(LOG_TAG, "The latitute is" + lat);
@@ -88,6 +90,11 @@ public class WeatherFragment extends Fragment {
         return fragmentView;
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
@@ -135,9 +142,22 @@ public class WeatherFragment extends Fragment {
         String userLat = String.valueOf(userLocation.getLatitude());
         String userLon = String.valueOf(userLocation.getLongitude());
 
-        String[] userLatLon = new String[] {userLat, userLon};
-
-        return userLatLon;
+        return new  String[] {userLat, userLon};
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        int permissionCheck = ContextCompat.checkSelfPermission(getActivity(),
+                Manifest.permission.ACCESS_COARSE_LOCATION);
+        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+            mLocationManager.removeUpdates(locationListener);
+        }
+    }
 }
