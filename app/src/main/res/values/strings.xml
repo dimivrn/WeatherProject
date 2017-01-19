@@ -12,4 +12,8 @@
 
     <string name="back_slash">&#160;/&#160;</string>
 
+    <!-- No internet string -->
+    <string name="no_internet_connection_string">Unfortunately there is no internet connection right now!</string>
+
+
 </resources>

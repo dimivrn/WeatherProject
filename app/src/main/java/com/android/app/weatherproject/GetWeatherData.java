@@ -2,7 +2,6 @@ package com.android.app.weatherproject;
 
 import android.content.Context;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 
@@ -19,7 +18,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GetWeatherData extends AsyncTask<String, Void, List<Weather>> {
+final class GetWeatherData {
 
     // Tag for logging reasons
     private static final String LOG_TAG = GetWeatherData.class.getSimpleName();
@@ -32,11 +31,10 @@ public class GetWeatherData extends AsyncTask<String, Void, List<Weather>> {
         mWeatherAdapter = weatherAdapter;
     }
 
-    @Override
-    protected List<Weather> doInBackground(String... objects) {
+    public static List<Weather> fetchWeatherData(String lat, String lon) {
 
         // If there's no coordinates, there's nothing to do
-        if (objects.length == 0) {
+        if (lat == null && lon == null) {
             return null;
         }
 
@@ -58,7 +56,7 @@ public class GetWeatherData extends AsyncTask<String, Void, List<Weather>> {
             // Construct the URL for the query with specified users location
             final String BASE_WEATHER_URL = "https://api.forecast.io/forecast/";
             final String LANGUAGE = "lang";
-            final String LATLON = objects[0] + "," + objects[1];
+            final String LATLON = lat + "," + lon;
             final String UNITS = "units";
             final String EXCLUDE = "exclude";
 
@@ -129,20 +127,7 @@ public class GetWeatherData extends AsyncTask<String, Void, List<Weather>> {
         return null;
     }
 
-    @Override
-    protected void onPostExecute(List<Weather> results) {
-            if (results != null) {
-
-                Log.v(LOG_TAG, "ON POST EXECUTE CALLED");
-                mWeatherAdapter.clear();
-                for (Weather weatherForecast : results) {
-                    mWeatherAdapter.add(weatherForecast);
-                    Log.v(LOG_TAG, "ADDING LIST ITEMS TO ADAPTER");
-                }
-            }
-    }
-
-    private List<Weather> getDataFromJson(String jsonForecast) throws JSONException {
+    private static List<Weather> getDataFromJson(String jsonForecast) throws JSONException {
 
         final int ARRAY_LENGTH = 8;
 
