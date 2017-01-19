@@ -29,7 +29,7 @@ public class WeatherFragment extends Fragment {
     private View mLayout;
 
     // The array adapter to be used to fetch the data in UI
-    ArrayAdapter<String> mWeatherAdapter;
+    ArrayAdapter<Weather> mWeatherAdapter;
 
     // Tag for logging reasons
     private static final String LOG_TAG = WeatherFragment.class.getSimpleName();
@@ -79,8 +79,7 @@ public class WeatherFragment extends Fragment {
 
         ListView weatherList = (ListView) fragmentView.findViewById(R.id.listView_weather);
 
-        mWeatherAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item_forecast,
-                R.id.forecast_textView, new ArrayList<String>());
+        mWeatherAdapter = new WeatherAdapter(getActivity(), new ArrayList<Weather>());
 
         GetWeatherData getWeatherData = new GetWeatherData(getActivity(), mWeatherAdapter);
         getWeatherData.execute(lat, lon);

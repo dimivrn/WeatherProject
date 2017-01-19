@@ -17,23 +17,25 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
-public class GetWeatherData extends AsyncTask<String, Void, String[]> {
+public class GetWeatherData extends AsyncTask<String, Void, List<Weather>> {
 
     // Tag for logging reasons
     private static final String LOG_TAG = GetWeatherData.class.getSimpleName();
 
-    private ArrayAdapter<String> mWeatherAdapter;
+    private ArrayAdapter<Weather> mWeatherAdapter;
     private final Context mContext;
 
-    public GetWeatherData(Context context, ArrayAdapter<String> weatherAdapter) {
+    public GetWeatherData(Context context, ArrayAdapter<Weather> weatherAdapter) {
         mContext = context;
         mWeatherAdapter = weatherAdapter;
     }
 
     @Override
-    protected String[] doInBackground(String... objects) {
+    protected List<Weather> doInBackground(String... objects) {
 
         // If there's no coordinates, there's nothing to do
         if (objects.length == 0) {
@@ -130,19 +132,19 @@ public class GetWeatherData extends AsyncTask<String, Void, String[]> {
     }
 
     @Override
-    protected void onPostExecute(String[] results) {
+    protected void onPostExecute(List<Weather> results) {
             if (results != null) {
 
                 Log.v(LOG_TAG, "ON POST EXECUTE CALLED");
                 mWeatherAdapter.clear();
-                for (String weatherForecast : results) {
+                for (Weather weatherForecast : results) {
                     mWeatherAdapter.add(weatherForecast);
                     Log.v(LOG_TAG, "ADDING LIST ITEMS TO ADAPTER");
                 }
             }
     }
 
-    private String[] getDataFromJson(String jsonForecast) throws JSONException {
+    private List<Weather> getDataFromJson(String jsonForecast) throws JSONException {
 
         final int ARRAY_LENGTH = 8;
 
@@ -161,16 +163,16 @@ public class GetWeatherData extends AsyncTask<String, Void, String[]> {
 
         JSONObject weatherForecast = new JSONObject(jsonForecast);
 
-        double locationLatitude = weatherForecast.getDouble(LAT);
-        double locationLongitude = weatherForecast.getDouble(LON);
+        // double locationLatitude = weatherForecast.getDouble(LAT);
+        // double locationLongitude = weatherForecast.getDouble(LON);
 
         JSONObject currentWeather = weatherForecast.getJSONObject(CURR_DAY);
         long time;
-        String todaySummary, todayIcon, todayFormattedTime;
+        String todaySummary, todayIcon;
 
         time = currentWeather.getLong(TIME);
         time *= 1000L;
-        todayFormattedTime = getDate(time);
+        //todayFormattedTime = getDate(time);
 
         todaySummary = currentWeather.getString(SUMMARY);
         todayIcon = currentWeather.getString(ICON);
@@ -179,17 +181,19 @@ public class GetWeatherData extends AsyncTask<String, Void, String[]> {
         JSONObject dailyWeather = weatherForecast.getJSONObject(DAILY);
         JSONArray arrayDaily = dailyWeather.getJSONArray(DATA);
 
+        List<Weather> forecastsObjects= new ArrayList<Weather>();
+//        forecastsObjects.add(0, new Weather(time, todaySummary, todayIcon, todayTemperature));
         String[] results = new String[ARRAY_LENGTH];
-        for (int i =0; i <arrayDaily.length(); i ++) {
+        for (int i = 0; i <arrayDaily.length(); i ++) {
             long timeDaily;
-            String day, summaryDaily, iconDaily;
+            String summaryDaily, iconDaily;
             int minTempDaily, maxTempDaily;
 
             JSONObject dayWeather = arrayDaily.getJSONObject(i);
 
             timeDaily = dayWeather.getLong(TIME);
             timeDaily *= 1000L;
-            day = getDate(timeDaily);
+            //day = getDate(timeDaily);
 
             summaryDaily = dayWeather.getString(SUMMARY);
             iconDaily = dayWeather.getString(ICON);
@@ -197,18 +201,29 @@ public class GetWeatherData extends AsyncTask<String, Void, String[]> {
             minTempDaily = (int) Math.round(dayWeather.getDouble(MIN_TEMP));
             maxTempDaily = (int) Math.round(dayWeather.getDouble(MAX_TEMP));
 
-            results[0] = todayFormattedTime + " - " + todaySummary + " - " + todayIcon + " - " + todayTemperature;
+//            results[0] = time + " - " + todaySummary + " - " + todayIcon + " - " + todayTemperature;
+//
+//            results[i] = timeDaily + " - " + summaryDaily + " - "
+//                    + minTempDaily + " , " + maxTempDaily;
 
-            results[i] = day + " - " + summaryDaily + " - "
-                    + minTempDaily + " , " + maxTempDaily;
+
+            Weather weatherObject = new Weather(timeDaily, summaryDaily, iconDaily, todayTemperature, minTempDaily, maxTempDaily);
+            forecastsObjects.add(weatherObject);
+
+            for (Weather obj : forecastsObjects) {
+                Log.v(LOG_TAG, "Forecast Entry: " + obj);
+                Log.v(LOG_TAG, "The size of results is " + results.length);
+            }
         }
 
-        for (String s : results) {
-            Log.v(LOG_TAG, "Forecast Entry: " + s);
-            Log.v(LOG_TAG, "The size of results is " + results.length);
-        }
+        //List<String> forecasts = new ArrayList<String>(Arrays.asList(results));
 
-        return results;
+//        for (String s : results) {
+//            Log.v(LOG_TAG, "Forecast Entry: " + s);
+//            Log.v(LOG_TAG, "The size of results is " + results.length);
+//        }
+
+        return forecastsObjects;
     }
 
     /**
