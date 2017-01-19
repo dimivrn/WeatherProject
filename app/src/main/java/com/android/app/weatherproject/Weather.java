@@ -8,21 +8,21 @@ public class Weather {
 
 
     private String mCurrentSummary, mCurrentIcon;
-    private int mCurrentTemperature;
+    private double mCurrentTemperature;
     private long mCurrentDate;
 
     private String mSummary, mIcon;
-    private int  mMinTemperature, mMaxTemperature;
+    private double  mMinTemperature, mMaxTemperature;
     private long mDate;
 
-     Weather(long currentDate, String currentSummary, String currentIcon, int currentTemp) {
+     Weather(long currentDate, String currentSummary, String currentIcon, double currentTemp) {
         mCurrentDate = currentDate;
         mCurrentSummary = currentSummary;
         mCurrentIcon = currentIcon;
         mCurrentTemperature = currentTemp;
     }
 
-     Weather(long date, String summary, String icon, int currentTemp, int minTemp, int maxTemp) {
+     Weather(long date, String summary, String icon, double currentTemp, double minTemp, double maxTemp) {
 
         mDate = date;
         mSummary = summary;
@@ -41,7 +41,7 @@ public class Weather {
         return mCurrentIcon;
     }
 
-    public int getCurrentTemperature() {
+    public double getCurrentTemperature() {
         return mCurrentTemperature;
     }
 
@@ -58,11 +58,11 @@ public class Weather {
         return mIcon;
     }
 
-    public int getMintemperature() {
+    public double getMintemperature() {
         return mMinTemperature;
     }
 
-    public int getMaxTemperature() {
+    public double getMaxTemperature() {
         return mMaxTemperature;
     }
 

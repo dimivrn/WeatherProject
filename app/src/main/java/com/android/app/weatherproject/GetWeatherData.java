@@ -16,9 +16,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class GetWeatherData extends AsyncTask<String, Void, List<Weather>> {
@@ -176,7 +174,7 @@ public class GetWeatherData extends AsyncTask<String, Void, List<Weather>> {
 
         todaySummary = currentWeather.getString(SUMMARY);
         todayIcon = currentWeather.getString(ICON);
-        int todayTemperature = (int) Math.round(currentWeather.getDouble(TEMPERATURE));
+        double todayTemperature = currentWeather.getDouble(TEMPERATURE);
 
         JSONObject dailyWeather = weatherForecast.getJSONObject(DAILY);
         JSONArray arrayDaily = dailyWeather.getJSONArray(DATA);
@@ -184,10 +182,10 @@ public class GetWeatherData extends AsyncTask<String, Void, List<Weather>> {
         List<Weather> forecastsObjects= new ArrayList<Weather>();
 //        forecastsObjects.add(0, new Weather(time, todaySummary, todayIcon, todayTemperature));
         String[] results = new String[ARRAY_LENGTH];
-        for (int i = 0; i <arrayDaily.length(); i ++) {
+        for (int i = 1; i <arrayDaily.length(); i ++) {
             long timeDaily;
             String summaryDaily, iconDaily;
-            int minTempDaily, maxTempDaily;
+            double minTempDaily, maxTempDaily;
 
             JSONObject dayWeather = arrayDaily.getJSONObject(i);
 
@@ -198,8 +196,8 @@ public class GetWeatherData extends AsyncTask<String, Void, List<Weather>> {
             summaryDaily = dayWeather.getString(SUMMARY);
             iconDaily = dayWeather.getString(ICON);
 
-            minTempDaily = (int) Math.round(dayWeather.getDouble(MIN_TEMP));
-            maxTempDaily = (int) Math.round(dayWeather.getDouble(MAX_TEMP));
+            minTempDaily = dayWeather.getDouble(MIN_TEMP);
+            maxTempDaily = dayWeather.getDouble(MAX_TEMP);
 
 //            results[0] = time + " - " + todaySummary + " - " + todayIcon + " - " + todayTemperature;
 //
@@ -215,6 +213,7 @@ public class GetWeatherData extends AsyncTask<String, Void, List<Weather>> {
                 Log.v(LOG_TAG, "The size of results is " + results.length);
             }
         }
+        forecastsObjects.add(0 , new Weather(time, todaySummary, todayIcon, todayTemperature));
 
         //List<String> forecasts = new ArrayList<String>(Arrays.asList(results));
 
@@ -224,21 +223,5 @@ public class GetWeatherData extends AsyncTask<String, Void, List<Weather>> {
 //        }
 
         return forecastsObjects;
-    }
-
-    /**
-     *
-     * @param timeInMilliseconds The time response from the API comes in milliseconds (UNIX time)
-     *                           and it must be converted
-     *
-     *
-     * @return The formatted date
-     */
-    private String getDate(long timeInMilliseconds) {
-
-        Date dateObject = new Date(timeInMilliseconds);
-
-        SimpleDateFormat dateFormatter = new SimpleDateFormat("MMM DD, yyyy");
-        return dateFormatter.format(dateObject);
     }
 }

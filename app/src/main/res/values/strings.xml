@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">Weather Project</string>
 
     <!-- TODO: Remove or change this placeholder text -->
@@ -6,4 +6,8 @@
     
     <!-- Denial of location permission -->
     <string name="location_permission_not_granted">Your location is required</string>
+
+    <!-- Temperature format -->
+    <string name="format_temperature"><xliff:g id="temp">%1.0f</xliff:g>\u00B0</string>
+
 </resources>
