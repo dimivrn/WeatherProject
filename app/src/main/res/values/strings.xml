@@ -10,4 +10,6 @@
     <!-- Temperature format -->
     <string name="format_temperature"><xliff:g id="temp">%1.0f</xliff:g>\u00B0</string>
 
+    <string name="back_slash">&#160;/&#160;</string>
+
 </resources>

@@ -2,11 +2,13 @@ package com.android.app.weatherproject;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -80,6 +82,10 @@ public class WeatherAdapter extends ArrayAdapter<Weather> {
         if (viewType == VIEW_TODAY) {
 
             String currentIcon = weatherForecast.getCurrentIcon();
+
+            LinearLayout linearLayoutBackground = (LinearLayout) listItemView.findViewById(R.id.linear_current_background);
+            linearLayoutBackground.setBackgroundColor(ContextCompat.getColor(getContext(),R.color.colorPrimary));
+
             viewHolder.currentIcon.setImageResource(UtilsMethods.getCurrentIcon(currentIcon));
 
             String currentText = weatherForecast.getCurrentSummary();

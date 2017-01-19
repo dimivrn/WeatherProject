@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="horizontal"
+    android:id="@+id/linear_current_background"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center_vertical"
@@ -33,45 +34,32 @@
             android:id="@+id/current_date_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
+            android:layout_marginStart="@dimen/textview_margin_start"
+            android:textColor="@android:color/white"
             tools:text="Σήμερα, Ιανουαρίου 19"/>
 
         <TextView
             android:id="@+id/current_temperature_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
-            android:textSize="38sp"
+            android:layout_marginStart="@dimen/textview_margin_start"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/current_temp_text_size"
             tools:text="10"/>
 
         <TextView
             android:id="@+id/current_summary_textView"
-            android:layout_marginStart="32dp"
+            android:layout_marginStart="@dimen/textview_margin_start"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/current_summary_text_size"
             tools:text="Καθαρός"/>
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/min_temperature_current"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="3"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text=" Έως "/>
-
-            <TextView
-                android:id="@+id/max_temperature_current"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="19"/>
 
         </LinearLayout>
 
