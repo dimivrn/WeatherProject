@@ -2,22 +2,6 @@
 <resources>
     <color name="colorPrimary">#00BCD4</color>
     <color name="colorPrimaryDark">#0097A7</color>
-    <color name="colorAccent">#FFEB3B</color>
-
-    <!-- Background colors -->
-    <color name="clear">#00BCD4</color>
-    <color name="light_rain">#3F51B5</color>
-    <color name="snow">#00796B</color>
-    <color name="sleet">#009688</color>
-    <color name="wind">#607D8B</color>
-    <color name="fog">#9E9E9E</color>
-    <color name="cloudy">#616161</color>
-    <color name="partly_cloudy">#F5F5F5</color>
-
-
-
-
-
-
+    <color name="colorAccent">#FFC107</color>
 
 </resources>

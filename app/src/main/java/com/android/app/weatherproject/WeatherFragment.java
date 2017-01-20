@@ -148,7 +148,6 @@ public class WeatherFragment extends Fragment implements
         super.onActivityCreated(savedInstanceState);
         Log.v(LOG_TAG,"ON ACTIVITY CREATED CALLED");
 
-
     }
 
     @Override
