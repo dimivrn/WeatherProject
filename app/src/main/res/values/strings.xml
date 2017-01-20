@@ -15,5 +15,8 @@
     <!-- No internet string -->
     <string name="no_internet_connection_string">Unfortunately there is no internet connection right now!</string>
 
+    <!-- Error with result from service -->
+    <string name="error_message">No such address found</string>
+    <string name="success_message">There is an address</string>
 
 </resources>

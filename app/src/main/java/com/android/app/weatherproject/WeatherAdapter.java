@@ -88,6 +88,9 @@ public class WeatherAdapter extends ArrayAdapter<Weather> {
 
             String currentIcon = weatherForecast.getCurrentIcon();
 
+            String currentLocation = weatherForecast.getLocation();
+            viewHolder.currentLocationTextView.setText(currentLocation);
+
             LinearLayout linearLayoutBackground = (LinearLayout) listItemView.findViewById(R.id.linear_current_background);
             linearLayoutBackground.setBackgroundColor(ContextCompat.getColor(getContext(),R.color.colorPrimary));
 

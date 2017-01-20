@@ -7,7 +7,7 @@ package com.android.app.weatherproject;
 public class Weather {
 
 
-    private String mCurrentSummary, mCurrentIcon;
+    private String mCurrentSummary, mCurrentIcon, mLocation;
     private double mCurrentTemperature;
     private long mCurrentDate;
 
@@ -15,11 +15,12 @@ public class Weather {
     private double  mMinTemperature, mMaxTemperature;
     private long mDate;
 
-     Weather(long currentDate, String currentSummary, String currentIcon, double currentTemp) {
+     Weather(long currentDate, String currentSummary, String currentIcon, double currentTemp, String currentLocation) {
         mCurrentDate = currentDate;
         mCurrentSummary = currentSummary;
         mCurrentIcon = currentIcon;
         mCurrentTemperature = currentTemp;
+        mLocation = currentLocation;
     }
 
      Weather(long date, String summary, String icon, double currentTemp,
@@ -71,4 +72,7 @@ public class Weather {
         return mDate;
     }
 
+    public String getLocation() {
+        return mLocation;
+    }
 }

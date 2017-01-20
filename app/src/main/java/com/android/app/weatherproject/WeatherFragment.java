@@ -3,11 +3,13 @@ package com.android.app.weatherproject;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -15,6 +17,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
+import android.support.v4.os.ResultReceiver;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,8 +45,11 @@ public class WeatherFragment extends Fragment implements
     private static final int WEATHER_LOADER_ID = 1;
 
     private Location mLastLocation;
+    private String mLocationString;
 
     private LocationRequest mLocationRequest;
+
+    public AddressResultReceiver mResultReceiver = new AddressResultReceiver(new Handler());
 
     // Root of the layout of fragment
     private View mLayout;
@@ -92,6 +98,11 @@ public class WeatherFragment extends Fragment implements
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         mGoogleApiClient.connect();
+
+        if (mGoogleApiClient.isConnected() && mLastLocation != null) {
+            startIntentService();
+        }
+
         super.onCreate(savedInstanceState);
     }
 
@@ -109,6 +120,7 @@ public class WeatherFragment extends Fragment implements
 
         weatherList.setAdapter(mWeatherAdapter);
         Log.v(LOG_TAG,"ON CREATE VIEW CALLED");
+
 
         createLocationRequest();
 
@@ -136,6 +148,7 @@ public class WeatherFragment extends Fragment implements
         super.onActivityCreated(savedInstanceState);
         Log.v(LOG_TAG,"ON ACTIVITY CREATED CALLED");
 
+
     }
 
     @Override
@@ -162,12 +175,19 @@ public class WeatherFragment extends Fragment implements
                     mGoogleApiClient);
         }
 
+        if (mGoogleApiClient.isConnected() && mLastLocation != null) {
+            startIntentService();
+        }
+
         lat = String.valueOf(mLastLocation.getLatitude());
         lon = String.valueOf(mLastLocation.getLongitude());
 
         mBundleCoordinates = new Bundle();
         mBundleCoordinates.putString("Latitude", lat);
         mBundleCoordinates.putString("Longitude", lon);
+        mBundleCoordinates.putString("Location", mLocationString);
+
+        Log.v(LOG_TAG, "START LOADER METHOD THE LOCATION IS " + mLocationString);
 
         // Here initialize the loader
         ConnectivityManager connManager = (ConnectivityManager)
@@ -186,12 +206,13 @@ public class WeatherFragment extends Fragment implements
             // Show the no internet connection
             mEmptyText.setText(R.string.no_internet_connection_string);
         }
+
+
     }
 
     @Override
     public void onResume() {
         super.onResume();
-
     }
 
     @Override
@@ -229,6 +250,13 @@ public class WeatherFragment extends Fragment implements
         return new WeatherLoader(getActivity(), mBundleCoordinates);
     }
 
+    protected void startIntentService() {
+        Intent intent = new Intent(getActivity(), FetchLocationIntentService.class);
+        intent.putExtra(FetchLocationIntentService.Constants.RECEIVER, mResultReceiver);
+        intent.putExtra(FetchLocationIntentService.Constants.LOCATION_DATA_EXTRA, mLastLocation);
+        getActivity().startService(intent);
+    }
+
     @Override
     public void onLoadFinished(Loader<List<Weather>> loader, List<Weather> data) {
         View loadingIndicator = getActivity().findViewById(R.id.progress_bar);
@@ -253,5 +281,31 @@ public class WeatherFragment extends Fragment implements
     public void onLocationChanged(Location location) {
         mLastLocation = location;
         startLoader();
+    }
+
+    class AddressResultReceiver extends ResultReceiver {
+
+        public AddressResultReceiver(Handler handler) {
+            super(handler);
+        }
+
+        @Override
+        protected void onReceiveResult(int resultCode, Bundle resultData) {
+
+            // Display the address string
+            // or an error message sent from the intent service.
+            mLocationString = resultData.getString(FetchLocationIntentService.Constants.RESULT_DATA_KEY);
+            displayAddressOutput(mLocationString);
+            Log.i(LOG_TAG, mLocationString);
+
+            // Show a toast message if an address was found.
+            if (resultCode == FetchLocationIntentService.Constants.SUCCESS_RESULT) {
+                Log.i(LOG_TAG, mLocationString);
+            }
+        }
+    }
+
+    public String displayAddressOutput(String add) {
+        return add;
     }
 }

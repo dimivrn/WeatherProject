@@ -31,7 +31,7 @@ final class GetWeatherData {
         mWeatherAdapter = weatherAdapter;
     }
 
-    public static List<Weather> fetchWeatherData(String lat, String lon) {
+    public static List<Weather> fetchWeatherData(String lat, String lon, String location) {
 
         // If there's no coordinates, there's nothing to do
         if (lat == null && lon == null) {
@@ -118,7 +118,8 @@ final class GetWeatherData {
             }
         }
         try {
-            return getDataFromJson(weatherJsonString);
+            Log.v(LOG_TAG, "GET DATA FROM JSON CALLED WITH LOCATION " + location);
+            return getDataFromJson(weatherJsonString, location);
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
@@ -127,7 +128,7 @@ final class GetWeatherData {
         return null;
     }
 
-    private static List<Weather> getDataFromJson(String jsonForecast) throws JSONException {
+    private static List<Weather> getDataFromJson(String jsonForecast, String location) throws JSONException {
 
         final int ARRAY_LENGTH = 8;
 
@@ -191,7 +192,7 @@ final class GetWeatherData {
                 Log.v(LOG_TAG, "The size of results is " + results.length);
             }
         }
-        forecastsObjects.add(0 , new Weather(time, todaySummary, todayIcon, todayTemperature));
+        forecastsObjects.add(0 , new Weather(time, todaySummary, todayIcon, todayTemperature, location));
 
         return forecastsObjects;
     }
