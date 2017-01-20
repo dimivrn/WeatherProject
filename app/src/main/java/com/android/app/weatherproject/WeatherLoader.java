@@ -3,7 +3,6 @@ package com.android.app.weatherproject;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.content.AsyncTaskLoader;
-import android.util.Log;
 
 import java.util.List;
 
@@ -19,7 +18,6 @@ public class WeatherLoader extends AsyncTaskLoader<List<Weather>> {
             mlat = coordinates.getString("Latitude");
             mlon = coordinates.getString("Longitude");
             location = coordinates.getString("Location");
-            Log.v(LOG_TAG, "LOCATION " + location);
         }
     }
 

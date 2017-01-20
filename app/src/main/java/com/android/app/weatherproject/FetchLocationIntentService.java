@@ -35,6 +35,7 @@ public class FetchLocationIntentService extends IntentService {
         // Get the location passed to this service through an extra.
         Location location = intent.getParcelableExtra(
                 Constants.LOCATION_DATA_EXTRA);
+        // Get the Result Receiver
         mReceiver = intent.getParcelableExtra(Constants.RECEIVER);
 
         List<Address> addresses = null;
@@ -51,12 +52,15 @@ public class FetchLocationIntentService extends IntentService {
         if (addresses == null || addresses.size() == 0) {
             Log.e(LOG_TAG, "No address found");
         } else {
+            // Get only the city name from addresses
             Address address = addresses.get(0);
             String cityName = address.getLocality();
             ArrayList<String> addressFragments = new ArrayList<String>();
 
             addressFragments.add(0, cityName);
 
+            // Fetch the address city name using getAddressLine,
+            // join them, and send them to the thread
             Log.i(LOG_TAG, getString(R.string.success_message));
             deliverResultToReceiver(Constants.SUCCESS_RESULT,
                     TextUtils.join(System.getProperty("line.separator"),
@@ -64,15 +68,16 @@ public class FetchLocationIntentService extends IntentService {
         }
     }
 
+    // Sending the location back to the ResultReceiver of fragment
     private void deliverResultToReceiver(int resultCode, String message) {
         Bundle bundle = new Bundle();
         bundle.putString(Constants.RESULT_DATA_KEY, message);
         mReceiver.send(resultCode, bundle);
     }
 
+    // Define Constant class to contain the needed values
     public final class Constants {
         static final int SUCCESS_RESULT = 0;
-        static final int FAILURE_RESULT = 1;
         static final String PACKAGE_NAME =
                 "com.android.app.weatherproject";
         static final String RECEIVER = PACKAGE_NAME + ".RECEIVER";

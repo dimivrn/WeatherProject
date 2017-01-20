@@ -31,6 +31,7 @@ public class WeatherAdapter extends ArrayAdapter<Weather> {
      * Use the ViewHolder pattern in order for caching the views for days list items
      */
     public static class ViewHolder {
+
         public final ImageView listIcon;
         public final TextView dateTextView;
         public final TextView summaryTextView;
@@ -130,11 +131,14 @@ public class WeatherAdapter extends ArrayAdapter<Weather> {
         return listItemView;
     }
 
+    // Get the view for current weather in position 0 of adapter and the following days view for all
+    // the other
     @Override
     public int getItemViewType(int position) {
         return (position == 0) ? VIEW_TODAY : VIEW_NEXT_DAY;
     }
 
+    // Return two ViewTypes
     @Override
     public int getViewTypeCount() {
         return 2;

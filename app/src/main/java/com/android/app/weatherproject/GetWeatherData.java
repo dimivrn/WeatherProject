@@ -69,7 +69,6 @@ final class GetWeatherData {
                     .build();
 
             URL url = new URL(builtUri.toString());
-            Log.v(LOG_TAG, "The constructed URL is " + url);
 
             // Create the request and open the connection
             urlConnection = (HttpURLConnection) url.openConnection();
@@ -142,13 +141,8 @@ final class GetWeatherData {
         final String DATA = "data";
         final String MIN_TEMP = "temperatureMin";
         final String MAX_TEMP = "temperatureMax";
-        final String LAT = "latitude";
-        final String LON = "longitude";
 
         JSONObject weatherForecast = new JSONObject(jsonForecast);
-
-        double locationLatitude = weatherForecast.getDouble(LAT);
-        double locationLongitude = weatherForecast.getDouble(LON);
 
         JSONObject currentWeather = weatherForecast.getJSONObject(CURR_DAY);
         long time;
@@ -192,6 +186,7 @@ final class GetWeatherData {
                 Log.v(LOG_TAG, "The size of results is " + results.length);
             }
         }
+        // Add the current weather object at first entry of ArrayList
         forecastsObjects.add(0 , new Weather(time, todaySummary, todayIcon, todayTemperature, location));
 
         return forecastsObjects;

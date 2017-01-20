@@ -4,7 +4,7 @@ package com.android.app.weatherproject;
  *  An {@link Weather} object contains all the related information for a single forecast
  */
 
-public class Weather {
+class Weather {
 
 
     private String mCurrentSummary, mCurrentIcon, mLocation;
@@ -35,44 +35,44 @@ public class Weather {
     }
 
 
-    public String getCurrentSummary() {
+     String getCurrentSummary() {
         return mCurrentSummary;
     }
 
-    public String getCurrentIcon() {
+     String getCurrentIcon() {
         return mCurrentIcon;
     }
 
-    public double getCurrentTemperature() {
+     double getCurrentTemperature() {
         return mCurrentTemperature;
     }
 
-    public long getCurrentDate() {
+     long getCurrentDate() {
         return mCurrentDate;
     }
 
 
-    public String getSummary() {
+     String getSummary() {
         return mSummary;
     }
 
-    public String getIcon() {
+     String getIcon() {
         return mIcon;
     }
 
-    public double getMintemperature() {
+     double getMintemperature() {
         return mMinTemperature;
     }
 
-    public double getMaxTemperature() {
+     double getMaxTemperature() {
         return mMaxTemperature;
     }
 
-    public long getDate() {
+     long getDate() {
         return mDate;
     }
 
-    public String getLocation() {
+     String getLocation() {
         return mLocation;
     }
 }
