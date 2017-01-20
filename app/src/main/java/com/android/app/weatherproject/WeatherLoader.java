@@ -14,9 +14,10 @@ public class WeatherLoader extends AsyncTaskLoader<List<Weather>> {
 
     WeatherLoader(Context context, Bundle coordinates) {
         super(context);
-        Bundle coord = coordinates;
-        mlat = coord.getString("Latitude");
-        mlon = coord.getString("Longitude");
+        if (coordinates != null) {
+            mlat = coordinates.getString("Latitude");
+            mlon = coordinates.getString("Longitude");
+        }
     }
 
     @Override
