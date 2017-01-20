@@ -22,7 +22,8 @@ public class Weather {
         mCurrentTemperature = currentTemp;
     }
 
-     Weather(long date, String summary, String icon, double currentTemp, double minTemp, double maxTemp) {
+     Weather(long date, String summary, String icon, double currentTemp,
+             double minTemp, double maxTemp) {
 
         mDate = date;
         mSummary = summary;
@@ -69,4 +70,5 @@ public class Weather {
     public long getDate() {
         return mDate;
     }
+
 }

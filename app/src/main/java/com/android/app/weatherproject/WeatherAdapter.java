@@ -1,6 +1,7 @@
 package com.android.app.weatherproject;
 
 import android.app.Activity;
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
@@ -19,9 +20,11 @@ public class WeatherAdapter extends ArrayAdapter<Weather> {
     // Integer representation of the view types
     private final int VIEW_TODAY = 0;
     private final int VIEW_NEXT_DAY = 1;
+    private Context ctx;
 
     WeatherAdapter(Activity context, ArrayList<Weather> weatherForecasts) {
         super(context, 0, weatherForecasts);
+        ctx = context;
     }
 
     /**
@@ -38,6 +41,7 @@ public class WeatherAdapter extends ArrayAdapter<Weather> {
         public final TextView currentDateTextView;
         public final TextView currentSummaryTextView;
         public final TextView currentTemperatureTextView;
+        public final TextView currentLocationTextView;
 
         public ViewHolder(View view) {
             listIcon = (ImageView) view.findViewById(R.id.list_item_icon);
@@ -50,6 +54,7 @@ public class WeatherAdapter extends ArrayAdapter<Weather> {
             currentDateTextView = (TextView) view.findViewById(R.id.current_date_textView);
             currentSummaryTextView = (TextView) view.findViewById(R.id.current_summary_textView);
             currentTemperatureTextView = (TextView) view.findViewById(R.id.current_temperature_textView);
+            currentLocationTextView = (TextView) view.findViewById(R.id.location_textView);
         }
     }
 
@@ -131,4 +136,5 @@ public class WeatherAdapter extends ArrayAdapter<Weather> {
     public int getViewTypeCount() {
         return 2;
     }
+
 }

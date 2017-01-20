@@ -146,8 +146,8 @@ final class GetWeatherData {
 
         JSONObject weatherForecast = new JSONObject(jsonForecast);
 
-        // double locationLatitude = weatherForecast.getDouble(LAT);
-        // double locationLongitude = weatherForecast.getDouble(LON);
+        double locationLatitude = weatherForecast.getDouble(LAT);
+        double locationLongitude = weatherForecast.getDouble(LON);
 
         JSONObject currentWeather = weatherForecast.getJSONObject(CURR_DAY);
         long time;
@@ -155,7 +155,6 @@ final class GetWeatherData {
 
         time = currentWeather.getLong(TIME);
         time *= 1000L;
-        //todayFormattedTime = getDate(time);
 
         todaySummary = currentWeather.getString(SUMMARY);
         todayIcon = currentWeather.getString(ICON);
@@ -176,7 +175,6 @@ final class GetWeatherData {
 
             timeDaily = dayWeather.getLong(TIME);
             timeDaily *= 1000L;
-            //day = getDate(timeDaily);
 
             summaryDaily = dayWeather.getString(SUMMARY);
             iconDaily = dayWeather.getString(ICON);
@@ -184,13 +182,8 @@ final class GetWeatherData {
             minTempDaily = dayWeather.getDouble(MIN_TEMP);
             maxTempDaily = dayWeather.getDouble(MAX_TEMP);
 
-//            results[0] = time + " - " + todaySummary + " - " + todayIcon + " - " + todayTemperature;
-//
-//            results[i] = timeDaily + " - " + summaryDaily + " - "
-//                    + minTempDaily + " , " + maxTempDaily;
-
-
-            Weather weatherObject = new Weather(timeDaily, summaryDaily, iconDaily, todayTemperature, minTempDaily, maxTempDaily);
+            Weather weatherObject = new Weather(timeDaily, summaryDaily, iconDaily, todayTemperature,
+                    minTempDaily, maxTempDaily);
             forecastsObjects.add(weatherObject);
 
             for (Weather obj : forecastsObjects) {
@@ -199,13 +192,6 @@ final class GetWeatherData {
             }
         }
         forecastsObjects.add(0 , new Weather(time, todaySummary, todayIcon, todayTemperature));
-
-        //List<String> forecasts = new ArrayList<String>(Arrays.asList(results));
-
-//        for (String s : results) {
-//            Log.v(LOG_TAG, "Forecast Entry: " + s);
-//            Log.v(LOG_TAG, "The size of results is " + results.length);
-//        }
 
         return forecastsObjects;
     }

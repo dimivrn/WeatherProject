@@ -39,6 +39,7 @@ public class WeatherFragment extends Fragment implements LoaderManager.LoaderCal
     // Root of the layout of fragment
     private View mLayout;
 
+    // Bundle for storing and passing the coordinates to Loader
     private Bundle mBundleCoordinates;
 
     // The coordinates of the user
@@ -97,8 +98,9 @@ public class WeatherFragment extends Fragment implements LoaderManager.LoaderCal
         Location lastKnownLocation = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         lat = String.valueOf(lastKnownLocation.getLatitude());
         lon = String.valueOf(lastKnownLocation.getLongitude());
-        Log.i(LOG_TAG, "The latitute is" + lat);
-        Log.i(LOG_TAG, "The longitute is" + lon);
+
+
+
         mBundleCoordinates = new Bundle();
         mBundleCoordinates.putString("Latitude", lat);
         mBundleCoordinates.putString("Longitude", lon);
@@ -156,7 +158,6 @@ public class WeatherFragment extends Fragment implements LoaderManager.LoaderCal
         public void onLocationChanged(Location location) {
             // Called when new location is found by the network location provider
             extractCoordinatesFromLocation(location);
-            Log.v(LOG_TAG, "EXTRACT COORDINATES IS CALLED");
         }
 
         @Override
@@ -201,16 +202,17 @@ public class WeatherFragment extends Fragment implements LoaderManager.LoaderCal
 
     @Override
     public Loader<List<Weather>> onCreateLoader(int id, Bundle args) {
-        Log.v(LOG_TAG, "onCreateLoader CALLED");
-        Loader weatherLoader = new WeatherLoader(getActivity(), mBundleCoordinates);
-
-        return weatherLoader;
+        // Create a new loader and pass the bundle with coordinates
+        return new WeatherLoader(getActivity(), mBundleCoordinates);
     }
 
     @Override
     public void onLoadFinished(Loader<List<Weather>> loader, List<Weather> data) {
         View loadingIndicator = getActivity().findViewById(R.id.progress_bar);
         loadingIndicator.setVisibility(View.GONE);
+
+        // Clear the adapter of previous data
+        mWeatherAdapter.clear();
 
         if (data != null && !data.isEmpty()) {
             mWeatherAdapter.addAll(data);
@@ -219,6 +221,8 @@ public class WeatherFragment extends Fragment implements LoaderManager.LoaderCal
 
     @Override
     public void onLoaderReset(Loader<List<Weather>> loader) {
+
+            // On reset clear any existing data
             mWeatherAdapter.clear();
     }
 }
