@@ -2,7 +2,6 @@ package com.android.app.weatherproject;
 
 import android.content.Context;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 
@@ -19,7 +18,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GetWeatherData extends AsyncTask<String, Void, List<Weather>> {
+final class GetWeatherData {
 
     // Tag for logging reasons
     private static final String LOG_TAG = GetWeatherData.class.getSimpleName();
@@ -32,11 +31,10 @@ public class GetWeatherData extends AsyncTask<String, Void, List<Weather>> {
         mWeatherAdapter = weatherAdapter;
     }
 
-    @Override
-    protected List<Weather> doInBackground(String... objects) {
+    public static List<Weather> fetchWeatherData(String lat, String lon, String location) {
 
         // If there's no coordinates, there's nothing to do
-        if (objects.length == 0) {
+        if (lat == null && lon == null) {
             return null;
         }
 
@@ -58,7 +56,7 @@ public class GetWeatherData extends AsyncTask<String, Void, List<Weather>> {
             // Construct the URL for the query with specified users location
             final String BASE_WEATHER_URL = "https://api.forecast.io/forecast/";
             final String LANGUAGE = "lang";
-            final String LATLON = objects[0] + "," + objects[1];
+            final String LATLON = lat + "," + lon;
             final String UNITS = "units";
             final String EXCLUDE = "exclude";
 
@@ -71,7 +69,6 @@ public class GetWeatherData extends AsyncTask<String, Void, List<Weather>> {
                     .build();
 
             URL url = new URL(builtUri.toString());
-            Log.v(LOG_TAG, "The constructed URL is " + url);
 
             // Create the request and open the connection
             urlConnection = (HttpURLConnection) url.openConnection();
@@ -120,7 +117,8 @@ public class GetWeatherData extends AsyncTask<String, Void, List<Weather>> {
             }
         }
         try {
-            return getDataFromJson(weatherJsonString);
+            Log.v(LOG_TAG, "GET DATA FROM JSON CALLED WITH LOCATION " + location);
+            return getDataFromJson(weatherJsonString, location);
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
@@ -129,20 +127,7 @@ public class GetWeatherData extends AsyncTask<String, Void, List<Weather>> {
         return null;
     }
 
-    @Override
-    protected void onPostExecute(List<Weather> results) {
-            if (results != null) {
-
-                Log.v(LOG_TAG, "ON POST EXECUTE CALLED");
-                mWeatherAdapter.clear();
-                for (Weather weatherForecast : results) {
-                    mWeatherAdapter.add(weatherForecast);
-                    Log.v(LOG_TAG, "ADDING LIST ITEMS TO ADAPTER");
-                }
-            }
-    }
-
-    private List<Weather> getDataFromJson(String jsonForecast) throws JSONException {
+    private static List<Weather> getDataFromJson(String jsonForecast, String location) throws JSONException {
 
         final int ARRAY_LENGTH = 8;
 
@@ -156,13 +141,8 @@ public class GetWeatherData extends AsyncTask<String, Void, List<Weather>> {
         final String DATA = "data";
         final String MIN_TEMP = "temperatureMin";
         final String MAX_TEMP = "temperatureMax";
-        final String LAT = "latitude";
-        final String LON = "longitude";
 
         JSONObject weatherForecast = new JSONObject(jsonForecast);
-
-        // double locationLatitude = weatherForecast.getDouble(LAT);
-        // double locationLongitude = weatherForecast.getDouble(LON);
 
         JSONObject currentWeather = weatherForecast.getJSONObject(CURR_DAY);
         long time;
@@ -170,7 +150,6 @@ public class GetWeatherData extends AsyncTask<String, Void, List<Weather>> {
 
         time = currentWeather.getLong(TIME);
         time *= 1000L;
-        //todayFormattedTime = getDate(time);
 
         todaySummary = currentWeather.getString(SUMMARY);
         todayIcon = currentWeather.getString(ICON);
@@ -191,7 +170,6 @@ public class GetWeatherData extends AsyncTask<String, Void, List<Weather>> {
 
             timeDaily = dayWeather.getLong(TIME);
             timeDaily *= 1000L;
-            //day = getDate(timeDaily);
 
             summaryDaily = dayWeather.getString(SUMMARY);
             iconDaily = dayWeather.getString(ICON);
@@ -199,13 +177,8 @@ public class GetWeatherData extends AsyncTask<String, Void, List<Weather>> {
             minTempDaily = dayWeather.getDouble(MIN_TEMP);
             maxTempDaily = dayWeather.getDouble(MAX_TEMP);
 
-//            results[0] = time + " - " + todaySummary + " - " + todayIcon + " - " + todayTemperature;
-//
-//            results[i] = timeDaily + " - " + summaryDaily + " - "
-//                    + minTempDaily + " , " + maxTempDaily;
-
-
-            Weather weatherObject = new Weather(timeDaily, summaryDaily, iconDaily, todayTemperature, minTempDaily, maxTempDaily);
+            Weather weatherObject = new Weather(timeDaily, summaryDaily, iconDaily, todayTemperature,
+                    minTempDaily, maxTempDaily);
             forecastsObjects.add(weatherObject);
 
             for (Weather obj : forecastsObjects) {
@@ -213,14 +186,8 @@ public class GetWeatherData extends AsyncTask<String, Void, List<Weather>> {
                 Log.v(LOG_TAG, "The size of results is " + results.length);
             }
         }
-        forecastsObjects.add(0 , new Weather(time, todaySummary, todayIcon, todayTemperature));
-
-        //List<String> forecasts = new ArrayList<String>(Arrays.asList(results));
-
-//        for (String s : results) {
-//            Log.v(LOG_TAG, "Forecast Entry: " + s);
-//            Log.v(LOG_TAG, "The size of results is " + results.length);
-//        }
+        // Add the current weather object at first entry of ArrayList
+        forecastsObjects.add(0 , new Weather(time, todaySummary, todayIcon, todayTemperature, location));
 
         return forecastsObjects;
     }

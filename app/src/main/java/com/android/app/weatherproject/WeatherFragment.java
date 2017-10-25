@@ -3,30 +3,75 @@ package com.android.app.weatherproject;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.Loader;
+import android.support.v4.os.ResultReceiver;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class WeatherFragment extends Fragment {
+import static android.view.View.GONE;
+import static com.google.android.gms.location.LocationServices.FusedLocationApi;
+
+public class WeatherFragment extends Fragment implements
+        LoaderManager.LoaderCallbacks<List<Weather>>, GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener {
+
+    // Constant value for the loader id
+    private static final int WEATHER_LOADER_ID = 1;
+
+    // The last known location returned
+    private Location mLastLocation;
+
+    // The location returned from IntentService to ResultReceiver
+    private String mLocationString;
+
+    // Location request object
+    private LocationRequest mLocationRequest;
+
+    // Result receiver to handle the response from FetchLocationIntentService
+    public AddressResultReceiver mResultReceiver = new AddressResultReceiver(new Handler());
 
     // Root of the layout of fragment
     private View mLayout;
+
+    // Bundle for storing and passing the coordinates to Loader
+    private Bundle mBundleCoordinates;
+
+    // The coordinates of the user
+    String lat, lon;
+
+    // No internet TextView
+    TextView mEmptyText;
+
+    LoaderManager manager;
+
+    // Instance of Google API Client
+    private GoogleApiClient mGoogleApiClient;
 
     // The array adapter to be used to fetch the data in UI
     ArrayAdapter<Weather> mWeatherAdapter;
@@ -34,10 +79,8 @@ public class WeatherFragment extends Fragment {
     // Tag for logging reasons
     private static final String LOG_TAG = WeatherFragment.class.getSimpleName();
 
-    private LocationManager mLocationManager;
-
     // An app defined request constant. The callback method gets the result of the request
-    final private int MY_REQUEST_ACCESS_COARSE_LOCATION = 100;
+    final private int MY_REQUEST_ACCESS_FINE_LOCATION = 100;
 
     public WeatherFragment() {
         // Required empty public constructor
@@ -46,8 +89,21 @@ public class WeatherFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        mLocationManager = (LocationManager) getActivity()
-                .getSystemService(Context.LOCATION_SERVICE);
+        Log.v(LOG_TAG,"ON ATTACH");
+
+        // Create instance of GoogleAPIClient
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(context)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+        }
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -56,42 +112,50 @@ public class WeatherFragment extends Fragment {
         // Inflate the layout for this fragment
         View fragmentView = inflater.inflate(R.layout.fragment_weather, container, false);
 
-        // Check if the permission for location is granted by the user
-        int permissionCheck = ContextCompat.checkSelfPermission(getActivity(),
-                Manifest.permission.ACCESS_COARSE_LOCATION);
-
-        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
-                    MY_REQUEST_ACCESS_COARSE_LOCATION);
-        } else {
-            Log.v(LOG_TAG, "PERMISSION LOCATION IS GRANTED");
-            // Register the listener with the Location Manager to receive location updates
-            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
-        }
-
-        // Utilize a cached location until the listener receive a more accurate position
-        Location lastKnownLocation = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        String lat = String.valueOf(lastKnownLocation.getLatitude());
-        String lon = String.valueOf(lastKnownLocation.getLongitude());
-        Log.i(LOG_TAG, "The latitute is" + lat);
-        Log.i(LOG_TAG, "The longitute is" + lon);
-
         ListView weatherList = (ListView) fragmentView.findViewById(R.id.listView_weather);
+        mEmptyText = (TextView) fragmentView.findViewById(R.id.empty_view);
+        weatherList.setEmptyView(mEmptyText);
 
         mWeatherAdapter = new WeatherAdapter(getActivity(), new ArrayList<Weather>());
 
-        GetWeatherData getWeatherData = new GetWeatherData(getActivity(), mWeatherAdapter);
-        getWeatherData.execute(lat, lon);
-
         weatherList.setAdapter(mWeatherAdapter);
+
+        ConnectivityManager connManager = (ConnectivityManager)
+                getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connManager.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            // Connect
+            mGoogleApiClient.connect();
+        } else {
+            // There is no Internet connection so
+            View loadingIndicator = fragmentView.findViewById(R.id.progress_bar);
+            loadingIndicator.setVisibility(GONE);
+            // Show the no internet connection
+            mEmptyText.setText(R.string.no_internet_connection_string);
+        }
+
+        // Create the location request object
+        createLocationRequest();
 
         return fragmentView;
     }
 
+    /**
+     * Call backs provided by GoogleAPIClient
+     */
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onConnected(@Nullable Bundle bundle) {
+        startLoader();
+        startLocationUpdates();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
 
@@ -99,7 +163,7 @@ public class WeatherFragment extends Fragment {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         switch (requestCode) {
-            case MY_REQUEST_ACCESS_COARSE_LOCATION: {
+            case MY_REQUEST_ACCESS_FINE_LOCATION: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Log.i(LOG_TAG, "LOCATION permission is granted.");
                 } else {
@@ -111,52 +175,163 @@ public class WeatherFragment extends Fragment {
         }
     }
 
-    // Define a listener that responds to Location updates
-    LocationListener locationListener = new LocationListener() {
-        @Override
-        public void onLocationChanged(Location location) {
-            // Called when new location is found by the network location provider
-            extractCoordinatesFromLocation(location);
-            Log.v(LOG_TAG, "EXTRACT COORDINATES IS CALLED");
+    /**
+     *
+     */
+    public void startLoader() {
+        int permissionCheck = ContextCompat.checkSelfPermission(getActivity(),
+                Manifest.permission.ACCESS_FINE_LOCATION);
+        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                    mGoogleApiClient);
         }
 
-        @Override
-        public void onStatusChanged(String s, int i, Bundle bundle) {
-
+        // Start the service from here
+        if (mGoogleApiClient.isConnected() && mLastLocation != null) {
+            startIntentService();
         }
 
-        @Override
-        public void onProviderEnabled(String s) {
+        // Get the coordinates from last known location and pass the in Loader
+        lat = String.valueOf(mLastLocation.getLatitude());
+        lon = String.valueOf(mLastLocation.getLongitude());
 
-        }
+        mBundleCoordinates = new Bundle();
+        mBundleCoordinates.putString("Latitude", lat);
+        mBundleCoordinates.putString("Longitude", lon);
+        mBundleCoordinates.putString("Location", mLocationString);
 
-        @Override
-        public void onProviderDisabled(String s) {
+        Log.v(LOG_TAG, "START LOADER METHOD THE LOCATION IS " + mLocationString);
 
-        }
-    };
 
-    public String[] extractCoordinatesFromLocation(Location userLocation) {
+            manager = getActivity().getSupportLoaderManager();
 
-        String userLat = String.valueOf(userLocation.getLatitude());
-        String userLon = String.valueOf(userLocation.getLongitude());
-
-        return new  String[] {userLat, userLon};
+            // Initialize the Loader
+            manager.initLoader(WEATHER_LOADER_ID, null, this);
+            manager.restartLoader(WEATHER_LOADER_ID, null, this);
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        int permissionCheck = ContextCompat.checkSelfPermission(getActivity(),
+                Manifest.permission.ACCESS_COARSE_LOCATION);
+        ConnectivityManager connManager = (ConnectivityManager)
+                getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connManager.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+            if (mGoogleApiClient != null) {
+                mGoogleApiClient.connect();
+            }
+        }
+        } else {
+            // There is no Internet connection so
+            View loadingIndicator = getActivity().findViewById(R.id.progress_bar);
+            loadingIndicator.setVisibility(GONE);
+            // Show the no internet connection
+            mEmptyText.setText(R.string.no_internet_connection_string);
+        }
 
+        if (mGoogleApiClient.isConnected() && mLastLocation != null) {
+            startLocationUpdates();
+        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        stopLocationUpdates();
+    }
+
+    // Lifecycle method here disconnect the Client
+    @Override
+    public void onStop() {
+        super.onStop();
+        mGoogleApiClient.disconnect();
+    }
+
+    // Instantiate a new Location Request and set the intervals
+    protected void createLocationRequest() {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(20000);
+        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+    }
+
+    // Start listening on location updates called in onConnected
+    protected void startLocationUpdates() {
         int permissionCheck = ContextCompat.checkSelfPermission(getActivity(),
-                Manifest.permission.ACCESS_COARSE_LOCATION);
+                Manifest.permission.ACCESS_FINE_LOCATION);
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-            mLocationManager.removeUpdates(locationListener);
+            FusedLocationApi.requestLocationUpdates(
+                    mGoogleApiClient, mLocationRequest, this);
+        }
+    }
+
+    // Stop listening for updates called in the onPause() method of lifecycle
+    protected void stopLocationUpdates() {
+        LocationServices.FusedLocationApi.removeLocationUpdates(
+                mGoogleApiClient, this);
+    }
+
+
+    protected void startIntentService() {
+        Intent intent = new Intent(getActivity(), FetchLocationIntentService.class);
+        intent.putExtra(FetchLocationIntentService.Constants.RECEIVER, mResultReceiver);
+        intent.putExtra(FetchLocationIntentService.Constants.LOCATION_DATA_EXTRA, mLastLocation);
+        getActivity().startService(intent);
+    }
+
+    @Override
+    public Loader<List<Weather>> onCreateLoader(int id, Bundle args) {
+        // Create a new loader and pass the bundle with coordinates
+        return new WeatherLoader(getActivity(), mBundleCoordinates);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<Weather>> loader, List<Weather> data) {
+        View loadingIndicator = getActivity().findViewById(R.id.progress_bar);
+        loadingIndicator.setVisibility(View.GONE);
+
+        // Clear the adapter of previous data
+        mWeatherAdapter.clear();
+
+        if (data != null && !data.isEmpty()) {
+            mWeatherAdapter.addAll(data);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<Weather>> loader) {
+        // On reset clear any existing data
+        mWeatherAdapter.clear();
+    }
+
+
+    @Override
+    public void onLocationChanged(Location location) {
+        mLastLocation = location;
+        startLoader();
+    }
+
+    class AddressResultReceiver extends ResultReceiver {
+
+         AddressResultReceiver(Handler handler) {
+            super(handler);
+        }
+
+        @Override
+        protected void onReceiveResult(int resultCode, Bundle resultData) {
+
+            // Display the address string
+            // or an error message sent from the intent service.
+            mLocationString = resultData.getString(FetchLocationIntentService.Constants.RESULT_DATA_KEY);
+            Log.i(LOG_TAG, mLocationString);
+
+            // Show a toast message if an address was found.
+            if (resultCode == FetchLocationIntentService.Constants.SUCCESS_RESULT) {
+                Log.i(LOG_TAG, mLocationString);
+            }
         }
     }
 }

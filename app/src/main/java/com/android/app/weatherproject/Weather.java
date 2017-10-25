@@ -4,10 +4,10 @@ package com.android.app.weatherproject;
  *  An {@link Weather} object contains all the related information for a single forecast
  */
 
-public class Weather {
+class Weather {
 
 
-    private String mCurrentSummary, mCurrentIcon;
+    private String mCurrentSummary, mCurrentIcon, mLocation;
     private double mCurrentTemperature;
     private long mCurrentDate;
 
@@ -15,14 +15,16 @@ public class Weather {
     private double  mMinTemperature, mMaxTemperature;
     private long mDate;
 
-     Weather(long currentDate, String currentSummary, String currentIcon, double currentTemp) {
+     Weather(long currentDate, String currentSummary, String currentIcon, double currentTemp, String currentLocation) {
         mCurrentDate = currentDate;
         mCurrentSummary = currentSummary;
         mCurrentIcon = currentIcon;
         mCurrentTemperature = currentTemp;
+        mLocation = currentLocation;
     }
 
-     Weather(long date, String summary, String icon, double currentTemp, double minTemp, double maxTemp) {
+     Weather(long date, String summary, String icon, double currentTemp,
+             double minTemp, double maxTemp) {
 
         mDate = date;
         mSummary = summary;
@@ -33,40 +35,44 @@ public class Weather {
     }
 
 
-    public String getCurrentSummary() {
+     String getCurrentSummary() {
         return mCurrentSummary;
     }
 
-    public String getCurrentIcon() {
+     String getCurrentIcon() {
         return mCurrentIcon;
     }
 
-    public double getCurrentTemperature() {
+     double getCurrentTemperature() {
         return mCurrentTemperature;
     }
 
-    public long getCurrentDate() {
+     long getCurrentDate() {
         return mCurrentDate;
     }
 
 
-    public String getSummary() {
+     String getSummary() {
         return mSummary;
     }
 
-    public String getIcon() {
+     String getIcon() {
         return mIcon;
     }
 
-    public double getMintemperature() {
+     double getMintemperature() {
         return mMinTemperature;
     }
 
-    public double getMaxTemperature() {
+     double getMaxTemperature() {
         return mMaxTemperature;
     }
 
-    public long getDate() {
+     long getDate() {
         return mDate;
+    }
+
+     String getLocation() {
+        return mLocation;
     }
 }

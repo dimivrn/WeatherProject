@@ -1,12 +1,15 @@
 package com.android.app.weatherproject;
 
 import android.app.Activity;
+import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -17,15 +20,18 @@ public class WeatherAdapter extends ArrayAdapter<Weather> {
     // Integer representation of the view types
     private final int VIEW_TODAY = 0;
     private final int VIEW_NEXT_DAY = 1;
+    private Context ctx;
 
     WeatherAdapter(Activity context, ArrayList<Weather> weatherForecasts) {
         super(context, 0, weatherForecasts);
+        ctx = context;
     }
 
     /**
      * Use the ViewHolder pattern in order for caching the views for days list items
      */
     public static class ViewHolder {
+
         public final ImageView listIcon;
         public final TextView dateTextView;
         public final TextView summaryTextView;
@@ -36,6 +42,7 @@ public class WeatherAdapter extends ArrayAdapter<Weather> {
         public final TextView currentDateTextView;
         public final TextView currentSummaryTextView;
         public final TextView currentTemperatureTextView;
+        public final TextView currentLocationTextView;
 
         public ViewHolder(View view) {
             listIcon = (ImageView) view.findViewById(R.id.list_item_icon);
@@ -48,6 +55,7 @@ public class WeatherAdapter extends ArrayAdapter<Weather> {
             currentDateTextView = (TextView) view.findViewById(R.id.current_date_textView);
             currentSummaryTextView = (TextView) view.findViewById(R.id.current_summary_textView);
             currentTemperatureTextView = (TextView) view.findViewById(R.id.current_temperature_textView);
+            currentLocationTextView = (TextView) view.findViewById(R.id.location_textView);
         }
     }
 
@@ -80,6 +88,13 @@ public class WeatherAdapter extends ArrayAdapter<Weather> {
         if (viewType == VIEW_TODAY) {
 
             String currentIcon = weatherForecast.getCurrentIcon();
+
+            String currentLocation = weatherForecast.getLocation();
+            viewHolder.currentLocationTextView.setText(currentLocation);
+
+            LinearLayout linearLayoutBackground = (LinearLayout) listItemView.findViewById(R.id.linear_current_background);
+            linearLayoutBackground.setBackgroundColor(ContextCompat.getColor(getContext(),R.color.colorPrimary));
+
             viewHolder.currentIcon.setImageResource(UtilsMethods.getCurrentIcon(currentIcon));
 
             String currentText = weatherForecast.getCurrentSummary();
@@ -116,13 +131,17 @@ public class WeatherAdapter extends ArrayAdapter<Weather> {
         return listItemView;
     }
 
+    // Get the view for current weather in position 0 of adapter and the following days view for all
+    // the other
     @Override
     public int getItemViewType(int position) {
         return (position == 0) ? VIEW_TODAY : VIEW_NEXT_DAY;
     }
 
+    // Return two ViewTypes
     @Override
     public int getViewTypeCount() {
         return 2;
     }
+
 }
