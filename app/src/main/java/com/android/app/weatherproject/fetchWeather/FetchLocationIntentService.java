@@ -22,7 +22,7 @@ public class FetchLocationIntentService extends IntentService {
 
     private static final String LOG_TAG = FetchLocationIntentService.class.getSimpleName();
 
-    public ResultReceiver mReceiver;
+    public android.os.ResultReceiver mReceiver;
 
     public FetchLocationIntentService() {
         super("background");
