@@ -1,16 +1,17 @@
-package com.android.app.weatherproject;
+package com.android.app.weatherproject.fetchWeather;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.content.AsyncTaskLoader;
+
+import com.android.app.weatherproject.data.Weather;
+import com.android.app.weatherproject.fetchWeather.GetWeatherData;
 
 import java.util.List;
 
 public class WeatherLoader extends AsyncTaskLoader<List<Weather>> {
 
     private String mlat, mlon, location;
-
-    private static final String LOG_TAG = WeatherLoader.class.getSimpleName();
 
     WeatherLoader(Context context, Bundle coordinates) {
         super(context);
@@ -32,8 +33,6 @@ public class WeatherLoader extends AsyncTaskLoader<List<Weather>> {
             return null;
         }
 
-        List<Weather> weatherList = GetWeatherData.fetchWeatherData(mlat, mlon, location);
-
-        return weatherList;
+        return GetWeatherData.fetchWeatherData(mlat, mlon, location);
     }
 }

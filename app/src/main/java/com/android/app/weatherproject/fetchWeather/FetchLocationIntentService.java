@@ -1,4 +1,4 @@
-package com.android.app.weatherproject;
+package com.android.app.weatherproject.fetchWeather;
 
 
 import android.app.IntentService;
@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.support.v4.os.ResultReceiver;
 import android.text.TextUtils;
 import android.util.Log;
+
+import com.android.app.weatherproject.R;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,8 +30,6 @@ public class FetchLocationIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        String error = "";
-
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
 
         // Get the location passed to this service through an extra.
@@ -76,7 +76,7 @@ public class FetchLocationIntentService extends IntentService {
     }
 
     // Define Constant class to contain the needed values
-    public final class Constants {
+    final class Constants {
         static final int SUCCESS_RESULT = 0;
         static final String PACKAGE_NAME =
                 "com.android.app.weatherproject";

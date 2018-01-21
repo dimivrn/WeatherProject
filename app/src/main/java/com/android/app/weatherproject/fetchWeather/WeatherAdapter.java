@@ -1,4 +1,4 @@
-package com.android.app.weatherproject;
+package com.android.app.weatherproject.fetchWeather;
 
 import android.app.Activity;
 import android.content.Context;
@@ -11,6 +11,10 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.android.app.weatherproject.R;
+import com.android.app.weatherproject.data.Weather;
+import com.android.app.weatherproject.utils.UtilsMethods;
 
 import java.util.ArrayList;
 
@@ -45,17 +49,17 @@ public class WeatherAdapter extends ArrayAdapter<Weather> {
         public final TextView currentLocationTextView;
 
         public ViewHolder(View view) {
-            listIcon = (ImageView) view.findViewById(R.id.list_item_icon);
-            dateTextView = (TextView) view.findViewById(R.id.list_date_textView);
-            summaryTextView = (TextView) view.findViewById(R.id.list_summary_textView);
-            highTempTextView = (TextView) view.findViewById(R.id.item_high_temp);
-            lowTempTextView = (TextView) view.findViewById(R.id.item_low_temp);
+            listIcon = view.findViewById(R.id.list_item_icon);
+            dateTextView = view.findViewById(R.id.list_date_textView);
+            summaryTextView = view.findViewById(R.id.list_summary_textView);
+            highTempTextView = view.findViewById(R.id.item_high_temp);
+            lowTempTextView = view.findViewById(R.id.item_low_temp);
 
-            currentIcon = (ImageView) view.findViewById(R.id.current_summary_icon);
-            currentDateTextView = (TextView) view.findViewById(R.id.current_date_textView);
-            currentSummaryTextView = (TextView) view.findViewById(R.id.current_summary_textView);
-            currentTemperatureTextView = (TextView) view.findViewById(R.id.current_temperature_textView);
-            currentLocationTextView = (TextView) view.findViewById(R.id.location_textView);
+            currentIcon = view.findViewById(R.id.current_summary_icon);
+            currentDateTextView = view.findViewById(R.id.current_date_textView);
+            currentSummaryTextView = view.findViewById(R.id.current_summary_textView);
+            currentTemperatureTextView = view.findViewById(R.id.current_temperature_textView);
+            currentLocationTextView = view.findViewById(R.id.location_textView);
         }
     }
 
@@ -92,8 +96,8 @@ public class WeatherAdapter extends ArrayAdapter<Weather> {
             String currentLocation = weatherForecast.getLocation();
             viewHolder.currentLocationTextView.setText(currentLocation);
 
-            LinearLayout linearLayoutBackground = (LinearLayout) listItemView.findViewById(R.id.linear_current_background);
-            linearLayoutBackground.setBackgroundColor(ContextCompat.getColor(getContext(),R.color.colorPrimary));
+            LinearLayout linearLayoutBackground = listItemView.findViewById(R.id.linear_current_background);
+            linearLayoutBackground.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
 
             viewHolder.currentIcon.setImageResource(UtilsMethods.getCurrentIcon(currentIcon));
 

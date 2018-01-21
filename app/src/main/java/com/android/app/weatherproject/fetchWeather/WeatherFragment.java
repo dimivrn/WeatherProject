@@ -1,4 +1,4 @@
-package com.android.app.weatherproject;
+package com.android.app.weatherproject.fetchWeather;
 
 
 import android.Manifest;
@@ -26,6 +26,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.android.app.weatherproject.R;
+import com.android.app.weatherproject.data.Weather;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
@@ -89,7 +91,7 @@ public class WeatherFragment extends Fragment implements
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        Log.v(LOG_TAG,"ON ATTACH");
+        Log.v(LOG_TAG, "ON ATTACH");
 
         // Create instance of GoogleAPIClient
         if (mGoogleApiClient == null) {
@@ -112,8 +114,8 @@ public class WeatherFragment extends Fragment implements
         // Inflate the layout for this fragment
         View fragmentView = inflater.inflate(R.layout.fragment_weather, container, false);
 
-        ListView weatherList = (ListView) fragmentView.findViewById(R.id.listView_weather);
-        mEmptyText = (TextView) fragmentView.findViewById(R.id.empty_view);
+        ListView weatherList = fragmentView.findViewById(R.id.listView_weather);
+        mEmptyText = fragmentView.findViewById(R.id.empty_view);
         weatherList.setEmptyView(mEmptyText);
 
         mWeatherAdapter = new WeatherAdapter(getActivity(), new ArrayList<Weather>());
@@ -139,6 +141,34 @@ public class WeatherFragment extends Fragment implements
 
         return fragmentView;
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        int permissionCheck = ContextCompat.checkSelfPermission(getActivity(),
+                Manifest.permission.ACCESS_COARSE_LOCATION);
+        ConnectivityManager connManager = (ConnectivityManager)
+                getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connManager.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+                if (mGoogleApiClient != null) {
+                    mGoogleApiClient.connect();
+                }
+            }
+        } else {
+            // There is no Internet connection so
+            View loadingIndicator = getActivity().findViewById(R.id.progress_bar);
+            loadingIndicator.setVisibility(GONE);
+            // Show the no internet connection
+            mEmptyText.setText(R.string.no_internet_connection_string);
+        }
+
+        if (mGoogleApiClient.isConnected() && mLastLocation != null) {
+            startLocationUpdates();
+        }
+    }
+
 
     /**
      * Call backs provided by GoogleAPIClient
@@ -203,51 +233,11 @@ public class WeatherFragment extends Fragment implements
         Log.v(LOG_TAG, "START LOADER METHOD THE LOCATION IS " + mLocationString);
 
 
-            manager = getActivity().getSupportLoaderManager();
+        manager = getActivity().getSupportLoaderManager();
 
-            // Initialize the Loader
-            manager.initLoader(WEATHER_LOADER_ID, null, this);
-            manager.restartLoader(WEATHER_LOADER_ID, null, this);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        int permissionCheck = ContextCompat.checkSelfPermission(getActivity(),
-                Manifest.permission.ACCESS_COARSE_LOCATION);
-        ConnectivityManager connManager = (ConnectivityManager)
-                getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connManager.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected()) {
-        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-            if (mGoogleApiClient != null) {
-                mGoogleApiClient.connect();
-            }
-        }
-        } else {
-            // There is no Internet connection so
-            View loadingIndicator = getActivity().findViewById(R.id.progress_bar);
-            loadingIndicator.setVisibility(GONE);
-            // Show the no internet connection
-            mEmptyText.setText(R.string.no_internet_connection_string);
-        }
-
-        if (mGoogleApiClient.isConnected() && mLastLocation != null) {
-            startLocationUpdates();
-        }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        stopLocationUpdates();
-    }
-
-    // Lifecycle method here disconnect the Client
-    @Override
-    public void onStop() {
-        super.onStop();
-        mGoogleApiClient.disconnect();
+        // Initialize the Loader
+        manager.initLoader(WEATHER_LOADER_ID, null, this);
+        manager.restartLoader(WEATHER_LOADER_ID, null, this);
     }
 
     // Instantiate a new Location Request and set the intervals
@@ -314,9 +304,22 @@ public class WeatherFragment extends Fragment implements
         startLoader();
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        stopLocationUpdates();
+    }
+
+    // Lifecycle method here disconnect the Client
+    @Override
+    public void onStop() {
+        super.onStop();
+        mGoogleApiClient.disconnect();
+    }
+
     class AddressResultReceiver extends ResultReceiver {
 
-         AddressResultReceiver(Handler handler) {
+        AddressResultReceiver(Handler handler) {
             super(handler);
         }
 

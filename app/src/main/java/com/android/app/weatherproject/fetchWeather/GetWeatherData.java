@@ -1,9 +1,12 @@
-package com.android.app.weatherproject;
+package com.android.app.weatherproject.fetchWeather;
 
 import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 import android.widget.ArrayAdapter;
+
+import com.android.app.weatherproject.BuildConfig;
+import com.android.app.weatherproject.data.Weather;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -158,10 +161,10 @@ final class GetWeatherData {
         JSONObject dailyWeather = weatherForecast.getJSONObject(DAILY);
         JSONArray arrayDaily = dailyWeather.getJSONArray(DATA);
 
-        List<Weather> forecastsObjects= new ArrayList<Weather>();
+        List<Weather> forecastsObjects = new ArrayList<Weather>();
 //        forecastsObjects.add(0, new Weather(time, todaySummary, todayIcon, todayTemperature));
         String[] results = new String[ARRAY_LENGTH];
-        for (int i = 1; i <arrayDaily.length(); i ++) {
+        for (int i = 1; i < arrayDaily.length(); i++) {
             long timeDaily;
             String summaryDaily, iconDaily;
             double minTempDaily, maxTempDaily;
@@ -187,7 +190,7 @@ final class GetWeatherData {
             }
         }
         // Add the current weather object at first entry of ArrayList
-        forecastsObjects.add(0 , new Weather(time, todaySummary, todayIcon, todayTemperature, location));
+        forecastsObjects.add(0, new Weather(time, todaySummary, todayIcon, todayTemperature, location));
 
         return forecastsObjects;
     }
