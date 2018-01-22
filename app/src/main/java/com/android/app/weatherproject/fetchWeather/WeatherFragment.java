@@ -2,7 +2,9 @@ package com.android.app.weatherproject.fetchWeather;
 
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -42,9 +44,6 @@ import static com.google.android.gms.location.LocationServices.getFusedLocationP
 
 public class WeatherFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<Weather>> {
 
-//        , GoogleApiClient.ConnectionCallbacks,
-//        GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener {
-
     // Constant value for the loader id
     private static final int WEATHER_LOADER_ID = 1;
 
@@ -53,9 +52,6 @@ public class WeatherFragment extends Fragment implements LoaderManager.LoaderCal
 
     // The location returned from IntentService to ResultReceiver
     private String mLocationString;
-
-    // Location request object
-    private LocationRequest mLocationRequest;
 
     // Result receiver to handle the response from FetchLocationIntentService
     public AddressResultReceiver mResultReceiver = new AddressResultReceiver(new Handler());
@@ -77,28 +73,17 @@ public class WeatherFragment extends Fragment implements LoaderManager.LoaderCal
     // The array adapter to be used to fetch the data in UI
     ArrayAdapter<Weather> mWeatherAdapter;
 
-    public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
+    public static final int MY_PERMISSIONS_REQUEST_LOCATION = 199;
 
     // Tag for logging reasons
     private static final String LOG_TAG = WeatherFragment.class.getSimpleName();
 
-    // An app defined request constant. The callback method gets the result of the request
     final private int MY_REQUEST_ACCESS_FINE_LOCATION = 100;
 
     private FusedLocationProviderClient mFusedLocationClient;
 
     public WeatherFragment() {
         // Required empty public constructor
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -118,8 +103,9 @@ public class WeatherFragment extends Fragment implements LoaderManager.LoaderCal
         ConnectivityManager connManager = (ConnectivityManager)
                 getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connManager.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected()) {
 
+        if (networkInfo != null && networkInfo.isConnected()) {
+            checkLocationPermission();
         } else {
             // There is no Internet connection so
             View loadingIndicator = fragmentView.findViewById(R.id.progress_bar);
@@ -139,29 +125,11 @@ public class WeatherFragment extends Fragment implements LoaderManager.LoaderCal
     @Override
     public void onResume() {
         super.onResume();
-        int permissionCheck = ContextCompat.checkSelfPermission(getActivity(),
-                Manifest.permission.ACCESS_COARSE_LOCATION);
         ConnectivityManager connManager = (ConnectivityManager)
                 getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connManager.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
-            if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-                mFusedLocationClient.getLastLocation()
-                        .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
-                            @Override
-                            public void onSuccess(Location location) {
-                                if (location != null) {
-                                    mLastLocation = location;
-                                    startLoader();
-                                }
-
-                            }
-                        });
-            } else {
-                ActivityCompat.requestPermissions(getActivity(),
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        MY_PERMISSIONS_REQUEST_LOCATION);
-            }
+            getLastLocation();
         } else {
             // There is no Internet connection so
             View loadingIndicator = getActivity().findViewById(R.id.progress_bar);
@@ -169,7 +137,25 @@ public class WeatherFragment extends Fragment implements LoaderManager.LoaderCal
             // Show the no internet connection
             mEmptyText.setText(R.string.no_internet_connection_string);
         }
+    }
 
+    private void getLastLocation() {
+        int permissionCheck = ContextCompat.checkSelfPermission(getActivity(),
+                Manifest.permission.ACCESS_COARSE_LOCATION);
+
+        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+            mFusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            if (location != null) {
+                                mLastLocation = location;
+                                startLoader();
+                            }
+
+                        }
+                    });
+        }
     }
 
     @Override
@@ -178,7 +164,7 @@ public class WeatherFragment extends Fragment implements LoaderManager.LoaderCal
         switch (requestCode) {
             case MY_REQUEST_ACCESS_FINE_LOCATION: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
+                    // The location permission was granted by the user
                     if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) ==
                             PackageManager.PERMISSION_GRANTED) {
                         mFusedLocationClient.getLastLocation()
@@ -189,7 +175,6 @@ public class WeatherFragment extends Fragment implements LoaderManager.LoaderCal
                                             mLastLocation = location;
                                             startLoader();
                                         }
-
                                     }
                                 });
                     }
@@ -202,29 +187,19 @@ public class WeatherFragment extends Fragment implements LoaderManager.LoaderCal
     }
 
     public void startLoader() {
-//        int permissionCheck = ContextCompat.checkSelfPermission(getActivity(),
-//                Manifest.permission.ACCESS_FINE_LOCATION);
-//        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-////            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-////                    mGoogleApiClient);
-//        }
-
         // Start the service from here
         if (mLastLocation != null) {
             startIntentService();
-        }
 
-        // Get the coordinates from last known location and pass the in Loader
-        lat = String.valueOf(mLastLocation.getLatitude());
-        lon = String.valueOf(mLastLocation.getLongitude());
+            // Get the coordinates from last known location and pass the in Loader
+            lat = String.valueOf(mLastLocation.getLatitude());
+            lon = String.valueOf(mLastLocation.getLongitude());
+        }
 
         mBundleCoordinates = new Bundle();
         mBundleCoordinates.putString("Latitude", lat);
         mBundleCoordinates.putString("Longitude", lon);
         mBundleCoordinates.putString("Location", mLocationString);
-
-        Log.v(LOG_TAG, "START LOADER METHOD THE LOCATION IS " + mLocationString);
-
 
         manager = getActivity().getSupportLoaderManager();
 
@@ -288,6 +263,41 @@ public class WeatherFragment extends Fragment implements LoaderManager.LoaderCal
     public void onLoaderReset(Loader<List<Weather>> loader) {
         // On reset clear any existing data
         mWeatherAdapter.clear();
+    }
+
+    private void checkLocationPermission() {
+        if (ContextCompat.checkSelfPermission(getActivity(),
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+                new AlertDialog.Builder(getActivity())
+                        .setTitle(R.string.title_location_permission)
+                        .setMessage(R.string.text_location_permission)
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                //Prompt the user once explanation has been shown
+                                ActivityCompat.requestPermissions(getActivity(),
+                                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                        MY_PERMISSIONS_REQUEST_LOCATION);
+                            }
+                        })
+                        .create()
+                        .show();
+            } else {
+                // No explanation needed, we can request the permission.
+                ActivityCompat.requestPermissions(getActivity(),
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        MY_PERMISSIONS_REQUEST_LOCATION);
+            }
+        }
     }
 
     @Override
