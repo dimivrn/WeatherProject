@@ -21,19 +21,17 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.android.app.weatherproject.R;
 import com.android.app.weatherproject.data.Weather;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
@@ -71,7 +69,7 @@ public class WeatherFragment extends Fragment implements LoaderManager.LoaderCal
     LoaderManager manager;
 
     // The array adapter to be used to fetch the data in UI
-    ArrayAdapter<Weather> mWeatherAdapter;
+    WeatherAdapter mWeatherAdapter;
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 199;
 
@@ -92,9 +90,10 @@ public class WeatherFragment extends Fragment implements LoaderManager.LoaderCal
         // Inflate the layout for this fragment
         View fragmentView = inflater.inflate(R.layout.fragment_weather, container, false);
 
-        ListView weatherList = fragmentView.findViewById(R.id.listView_weather);
+        RecyclerView weatherList = fragmentView.findViewById(R.id.listView_weather);
         mEmptyText = fragmentView.findViewById(R.id.empty_view);
-        weatherList.setEmptyView(mEmptyText);
+        //weatherList.setEmptyView(mEmptyText);
+        weatherList.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         mWeatherAdapter = new WeatherAdapter(getActivity(), new ArrayList<Weather>());
 
@@ -252,17 +251,17 @@ public class WeatherFragment extends Fragment implements LoaderManager.LoaderCal
         loadingIndicator.setVisibility(View.GONE);
 
         // Clear the adapter of previous data
-        mWeatherAdapter.clear();
+        mWeatherAdapter.clearWeatherData();
 
         if (data != null && !data.isEmpty()) {
-            mWeatherAdapter.addAll(data);
+            mWeatherAdapter.updateWeatherData(data);
         }
     }
 
     @Override
     public void onLoaderReset(Loader<List<Weather>> loader) {
         // On reset clear any existing data
-        mWeatherAdapter.clear();
+        mWeatherAdapter.clearWeatherData();
     }
 
     private void checkLocationPermission() {

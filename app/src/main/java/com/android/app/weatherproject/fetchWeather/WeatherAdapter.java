@@ -1,13 +1,11 @@
 package com.android.app.weatherproject.fetchWeather;
 
-import android.app.Activity;
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -16,136 +14,154 @@ import com.android.app.weatherproject.R;
 import com.android.app.weatherproject.data.Weather;
 import com.android.app.weatherproject.utils.UtilsMethods;
 
-import java.util.ArrayList;
+import java.util.List;
 
-public class WeatherAdapter extends ArrayAdapter<Weather> {
 
-    // Declare constants for the two different view types
-    // Integer representation of the view types
-    private final int VIEW_TODAY = 0;
-    private final int VIEW_NEXT_DAY = 1;
-    private Context ctx;
+public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherHolder> {
 
-    WeatherAdapter(Activity context, ArrayList<Weather> weatherForecasts) {
-        super(context, 0, weatherForecasts);
-        ctx = context;
+    private static final int ITEM_TYPE_HEADER = 0;
+    private static final int ITEM_TYPE_NORMAL = 1;
+
+    private List<Weather> mWeatherList;
+    private Context mContext;
+
+    WeatherAdapter(Context context, List<Weather> weatherList) {
+        mContext = context;
+        mWeatherList = weatherList;
     }
 
-    /**
-     * Use the ViewHolder pattern in order for caching the views for days list items
-     */
-    public static class ViewHolder {
-
-        public final ImageView listIcon;
-        public final TextView dateTextView;
-        public final TextView summaryTextView;
-        public final TextView highTempTextView;
-        public final TextView lowTempTextView;
-
-        public final ImageView currentIcon;
-        public final TextView currentDateTextView;
-        public final TextView currentSummaryTextView;
-        public final TextView currentTemperatureTextView;
-        public final TextView currentLocationTextView;
-
-        public ViewHolder(View view) {
-            listIcon = view.findViewById(R.id.list_item_icon);
-            dateTextView = view.findViewById(R.id.list_date_textView);
-            summaryTextView = view.findViewById(R.id.list_summary_textView);
-            highTempTextView = view.findViewById(R.id.item_high_temp);
-            lowTempTextView = view.findViewById(R.id.item_low_temp);
-
-            currentIcon = view.findViewById(R.id.current_summary_icon);
-            currentDateTextView = view.findViewById(R.id.current_date_textView);
-            currentSummaryTextView = view.findViewById(R.id.current_summary_textView);
-            currentTemperatureTextView = view.findViewById(R.id.current_temperature_textView);
-            currentLocationTextView = view.findViewById(R.id.location_textView);
-        }
-    }
-
-    @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public WeatherHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-        View listItemView = convertView;
+        switch (viewType) {
+            case ITEM_TYPE_HEADER:
+                return new WeatherHeaderHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.list_current_item, parent, false));
+            case ITEM_TYPE_NORMAL:
+                return new WeatherNormalHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_forecast, parent, false));
+        }
+        return null;
+    }
 
-        // Two different layout types
-        int viewType = getItemViewType(position);
-        int viewId = -1;
+    @Override
+    public void onBindViewHolder(WeatherHolder holder, int position) {
 
-        if (listItemView == null) {
-            if (viewType == VIEW_TODAY) {
-                viewId = R.layout.list_current_item;
-            } else if (viewType == VIEW_NEXT_DAY) {
-                viewId = R.layout.list_item_forecast;
-            }
+        Weather weatherData = mWeatherList.get(position);
 
-            listItemView = LayoutInflater.from(getContext()).inflate(viewId, parent, false);
-            ViewHolder listItemHolder = new ViewHolder(listItemView);
-            listItemView.setTag(listItemHolder);
+        switch (holder.getItemViewType()) {
+            case ITEM_TYPE_HEADER:
+                WeatherHeaderHolder weatherHeaderHolder = (WeatherHeaderHolder) holder;
+                weatherHeaderHolder.bindHeaderData(weatherData);
+                break;
+            case ITEM_TYPE_NORMAL:
+                WeatherNormalHolder weatherNormalHolder = (WeatherNormalHolder) holder;
+                weatherNormalHolder.bindNormalData(weatherData);
+        }
+    }
+
+    @Override
+    public int getItemCount() {
+        return mWeatherList.size();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (position == 0) {
+            return ITEM_TYPE_HEADER;
+        } else {
+            return ITEM_TYPE_NORMAL;
+        }
+    }
+
+    void updateWeatherData(List<Weather> updatedWeatherData) {
+        mWeatherList = updatedWeatherData;
+        notifyDataSetChanged();
+    }
+
+    void clearWeatherData() {
+        mWeatherList.clear();
+        notifyDataSetChanged();
+    }
+
+    class WeatherHolder extends RecyclerView.ViewHolder {
+
+        WeatherHolder(View itemView) {
+            super(itemView);
+        }
+    }
+
+    class WeatherHeaderHolder extends WeatherHolder {
+
+        private TextView currentDateTextView, currentSummaryTextView, currentTemperatureTextView;
+        private TextView currentLocationTextView;
+        private ImageView currentIcon;
+
+        WeatherHeaderHolder(View itemView) {
+            super(itemView);
+
+            currentIcon = itemView.findViewById(R.id.current_summary_icon);
+            currentDateTextView = itemView.findViewById(R.id.current_date_textView);
+            currentSummaryTextView = itemView.findViewById(R.id.current_summary_textView);
+            currentTemperatureTextView = itemView.findViewById(R.id.current_temperature_textView);
+            currentLocationTextView = itemView.findViewById(R.id.location_textView);
         }
 
-        Weather weatherForecast = getItem(position);
-
-        ViewHolder viewHolder = (ViewHolder) listItemView.getTag();
-
-        if (viewType == VIEW_TODAY) {
-
-            String currentIcon = weatherForecast.getCurrentIcon();
+        private void bindHeaderData(Weather weatherForecast) {
+            String currentIconString = weatherForecast.getCurrentIcon();
 
             String currentLocation = weatherForecast.getLocation();
-            viewHolder.currentLocationTextView.setText(currentLocation);
+            currentLocationTextView.setText(currentLocation);
 
-            LinearLayout linearLayoutBackground = listItemView.findViewById(R.id.linear_current_background);
-            linearLayoutBackground.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
+            LinearLayout linearLayoutBackground = itemView.findViewById(R.id.linear_current_background);
+            linearLayoutBackground.setBackgroundColor(ContextCompat.getColor(mContext, R.color.colorPrimary));
 
-            viewHolder.currentIcon.setImageResource(UtilsMethods.getCurrentIcon(currentIcon));
+            currentIcon.setImageResource(UtilsMethods.getCurrentIcon(currentIconString));
 
             String currentText = weatherForecast.getCurrentSummary();
-            viewHolder.currentSummaryTextView.setText(currentText);
+            currentSummaryTextView.setText(currentText);
 
             long currentDate = weatherForecast.getCurrentDate();
-            viewHolder.currentDateTextView.setText(UtilsMethods.getDate(currentDate));
+            currentDateTextView.setText(UtilsMethods.getDate(currentDate));
 
             double currentTemp = weatherForecast.getCurrentTemperature();
-            viewHolder.currentTemperatureTextView.setText(String.valueOf(UtilsMethods.formatTemperature(getContext(), currentTemp)));
-        } else {
+            currentTemperatureTextView.setText(String.valueOf(UtilsMethods.formatTemperature(mContext, currentTemp)));
+        }
+    }
 
+    class WeatherNormalHolder extends WeatherHolder {
+
+        private ImageView listIcon;
+        private TextView dateTextView, summaryTextView, highTempTextView, lowTempTextView;
+
+        WeatherNormalHolder(View itemView) {
+            super(itemView);
+
+            listIcon = itemView.findViewById(R.id.list_item_icon);
+            dateTextView = itemView.findViewById(R.id.list_date_textView);
+            summaryTextView = itemView.findViewById(R.id.list_summary_textView);
+            highTempTextView = itemView.findViewById(R.id.item_high_temp);
+            lowTempTextView = itemView.findViewById(R.id.item_low_temp);
+        }
+
+        private void bindNormalData(Weather weatherForecast) {
             String weatherIcon = weatherForecast.getIcon();
             // Set the image
-            viewHolder.listIcon.setImageResource(UtilsMethods.getListIcon(weatherIcon));
+            listIcon.setImageResource(UtilsMethods.getListIcon(weatherIcon));
 
             // Read the date for the Weather object
             long nextDate = weatherForecast.getDate();
-            viewHolder.dateTextView.setText(UtilsMethods.getDate(nextDate));
+            dateTextView.setText(UtilsMethods.getDate(nextDate));
 
             // Get the summary of the day's weather
             String nextSummary = weatherForecast.getSummary();
-            viewHolder.summaryTextView.setText(nextSummary);
+            summaryTextView.setText(nextSummary);
 
             // Get the minimum temperature for the day
             double minTemp = weatherForecast.getMintemperature();
-            viewHolder.lowTempTextView.setText(String.valueOf(UtilsMethods.formatTemperature(getContext(), minTemp)));
+            lowTempTextView.setText(String.valueOf(UtilsMethods.formatTemperature(mContext, minTemp)));
 
             // Get the maximum temperature for the day
             double maxTemp = weatherForecast.getMaxTemperature();
-            viewHolder.highTempTextView.setText(String.valueOf(UtilsMethods.formatTemperature(getContext(), maxTemp)));
-
+            highTempTextView.setText(String.valueOf(UtilsMethods.formatTemperature(mContext, maxTemp)));
         }
-        return listItemView;
     }
-
-    // Get the view for current weather in position 0 of adapter and the following days view for all
-    // the other
-    @Override
-    public int getItemViewType(int position) {
-        return (position == 0) ? VIEW_TODAY : VIEW_NEXT_DAY;
-    }
-
-    // Return two ViewTypes
-    @Override
-    public int getViewTypeCount() {
-        return 2;
-    }
-
 }
