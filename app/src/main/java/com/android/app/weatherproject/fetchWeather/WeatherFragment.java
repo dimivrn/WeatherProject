@@ -148,7 +148,7 @@ public class WeatherFragment extends Fragment implements LoaderManager.LoaderCal
                         public void onSuccess(Location location) {
                             if (location != null) {
                                 mLastLocation = location;
-                                startLoader();
+                                startIntentService();
                             }
 
                         }
@@ -159,7 +159,7 @@ public class WeatherFragment extends Fragment implements LoaderManager.LoaderCal
     public void startLoader() {
         // Start the service from here
         if (mLastLocation != null) {
-            startIntentService();
+//            startIntentService();
 
             // Get the coordinates from last known location and pass the in Loader
             lat = String.valueOf(mLastLocation.getLatitude());
@@ -288,14 +288,11 @@ public class WeatherFragment extends Fragment implements LoaderManager.LoaderCal
         @Override
         protected void onReceiveResult(int resultCode, Bundle resultData) {
 
-            // Display the address string
-            // or an error message sent from the intent service.
-            mLocationString = resultData.getString(FetchLocationIntentService.Constants.RESULT_DATA_KEY);
-            Log.i(LOG_TAG, mLocationString);
-
             // Show a toast message if an address was found.
             if (resultCode == FetchLocationIntentService.Constants.SUCCESS_RESULT) {
-                Log.i(LOG_TAG, mLocationString);
+                mLocationString = resultData.getString(FetchLocationIntentService.Constants.RESULT_DATA_KEY);
+
+                startLoader();
             }
         }
     }

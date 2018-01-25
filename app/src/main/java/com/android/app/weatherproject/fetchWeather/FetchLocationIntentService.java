@@ -55,7 +55,7 @@ public class FetchLocationIntentService extends IntentService {
             // Get only the city name from addresses
             Address address = addresses.get(0);
             String cityName = address.getLocality();
-            ArrayList<String> addressFragments = new ArrayList<String>();
+            ArrayList<String> addressFragments = new ArrayList<>();
 
             addressFragments.add(0, cityName);
 
