@@ -192,7 +192,7 @@ public class WeatherFragment extends Fragment implements LoaderManager.LoaderCal
     }
 
     @Override
-    public void onLoadFinished(Loader<List<Weather>> loader, List<Weather> data) {
+    public void onLoadFinished(Loader<List<Weather>> loader, final List<Weather> data) {
         View loadingIndicator = getActivity().findViewById(R.id.progress_bar);
         loadingIndicator.setVisibility(View.GONE);
 
@@ -200,7 +200,12 @@ public class WeatherFragment extends Fragment implements LoaderManager.LoaderCal
         mWeatherAdapter.clearWeatherData();
 
         if (data != null && !data.isEmpty()) {
-            mWeatherAdapter.updateWeatherData(data);
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mWeatherAdapter.updateWeatherData(data);
+                }
+            });
         }
     }
 

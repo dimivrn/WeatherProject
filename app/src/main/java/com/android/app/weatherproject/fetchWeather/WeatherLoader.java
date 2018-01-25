@@ -33,6 +33,6 @@ public class WeatherLoader extends AsyncTaskLoader<List<Weather>> {
             return null;
         }
 
-        return GetWeatherData.fetchWeatherData(mlat, mlon, location);
+        return GetWeatherData.fetchWeatherDataOk(mlat, mlon, location);
     }
 }
