@@ -29,13 +29,13 @@ import okhttp3.Response;
 final class GetWeatherData {
 
 
-    static List<Weather> fetchWeatherDataOk(String lat, String lon, final String location) {
+    static List<Weather> fetchWeatherDataOk(String lat, String lon, final String location) throws IOException, JSONException {
 
         String language = "el";
         String units = "si";
         String exclude = "flags,hourly";
 
-        Response weatherResponse = null;
+        Response weatherResponse;
 
         URL weatherUrl = null;
 
@@ -66,18 +66,9 @@ final class GetWeatherData {
                 .url(weatherUrl)
                 .build();
 
-        try {
-            weatherResponse = client.newCall(request).execute();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        weatherResponse = client.newCall(request).execute();
 
-        try {
-            return getDataFromJson(weatherResponse.body().string(), location);
-        } catch (IOException | JSONException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return getDataFromJson(weatherResponse.body().string(), location);
     }
 
     private static List<Weather> getDataFromJson(String jsonForecast, String location) throws JSONException {

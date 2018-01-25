@@ -7,6 +7,9 @@ import android.support.v4.content.AsyncTaskLoader;
 import com.android.app.weatherproject.data.Weather;
 import com.android.app.weatherproject.fetchWeather.GetWeatherData;
 
+import org.json.JSONException;
+
+import java.io.IOException;
 import java.util.List;
 
 public class WeatherLoader extends AsyncTaskLoader<List<Weather>> {
@@ -33,6 +36,11 @@ public class WeatherLoader extends AsyncTaskLoader<List<Weather>> {
             return null;
         }
 
-        return GetWeatherData.fetchWeatherDataOk(mlat, mlon, location);
+        try {
+            return GetWeatherData.fetchWeatherDataOk(mlat, mlon, location);
+        } catch (IOException | JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
