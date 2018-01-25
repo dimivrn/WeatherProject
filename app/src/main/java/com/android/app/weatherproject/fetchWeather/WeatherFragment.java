@@ -85,14 +85,13 @@ public class WeatherFragment extends Fragment implements LoaderManager.LoaderCal
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View fragmentView = inflater.inflate(R.layout.fragment_weather, container, false);
 
         RecyclerView weatherList = fragmentView.findViewById(R.id.listView_weather);
         mEmptyText = fragmentView.findViewById(R.id.empty_view);
-        //weatherList.setEmptyView(mEmptyText);
         weatherList.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         mWeatherAdapter = new WeatherAdapter(getActivity(), new ArrayList<Weather>());
@@ -140,7 +139,7 @@ public class WeatherFragment extends Fragment implements LoaderManager.LoaderCal
 
     private void getLastLocation() {
         int permissionCheck = ContextCompat.checkSelfPermission(getActivity(),
-                Manifest.permission.ACCESS_COARSE_LOCATION);
+                Manifest.permission.ACCESS_FINE_LOCATION);
 
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
             mFusedLocationClient.getLastLocation()
@@ -154,34 +153,6 @@ public class WeatherFragment extends Fragment implements LoaderManager.LoaderCal
 
                         }
                     });
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case MY_REQUEST_ACCESS_FINE_LOCATION: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // The location permission was granted by the user
-                    if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) ==
-                            PackageManager.PERMISSION_GRANTED) {
-                        mFusedLocationClient.getLastLocation()
-                                .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
-                                    @Override
-                                    public void onSuccess(Location location) {
-                                        if (mLastLocation != null) {
-                                            mLastLocation = location;
-                                            startLoader();
-                                        }
-                                    }
-                                });
-                    }
-                } else {
-                    Snackbar.make(mLayout, R.string.location_permission_not_granted,
-                            Snackbar.LENGTH_SHORT).show();
-                }
-            }
         }
     }
 
@@ -206,31 +177,6 @@ public class WeatherFragment extends Fragment implements LoaderManager.LoaderCal
         manager.initLoader(WEATHER_LOADER_ID, null, this);
         manager.restartLoader(WEATHER_LOADER_ID, null, this);
     }
-
-//    // Instantiate a new Location Request and set the intervals
-//    protected void createLocationRequest() {
-//        mLocationRequest = new LocationRequest();
-//        mLocationRequest.setInterval(20000);
-//        mLocationRequest.setFastestInterval(5000);
-//        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-//    }
-
-//    // Start listening on location updates called in onConnected
-//    protected void startLocationUpdates() {
-//        int permissionCheck = ContextCompat.checkSelfPermission(getActivity(),
-//                Manifest.permission.ACCESS_FINE_LOCATION);
-//        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-//            FusedLocationApi.requestLocationUpdates(
-//                    mGoogleApiClient, mLocationRequest, this);
-//        }
-//    }
-//
-//    // Stop listening for updates called in the onPause() method of lifecycle
-//    protected void stopLocationUpdates() {
-//        LocationServices.FusedLocationApi.removeLocationUpdates(
-//                mGoogleApiClient, this);
-//    }
-
 
     protected void startIntentService() {
         Intent intent = new Intent(getActivity(), FetchLocationIntentService.class);
@@ -295,6 +241,25 @@ public class WeatherFragment extends Fragment implements LoaderManager.LoaderCal
                 ActivityCompat.requestPermissions(getActivity(),
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                         MY_PERMISSIONS_REQUEST_LOCATION);
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case MY_REQUEST_ACCESS_FINE_LOCATION: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // The location permission was granted by the user
+                    if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) ==
+                            PackageManager.PERMISSION_GRANTED) {
+                        getLastLocation();
+                    }
+                } else {
+                    Snackbar.make(mLayout, R.string.location_permission_not_granted,
+                            Snackbar.LENGTH_SHORT).show();
+                }
             }
         }
     }
