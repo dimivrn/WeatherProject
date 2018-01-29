@@ -3,6 +3,7 @@ package com.android.app.weatherproject.fetchWeather;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -40,7 +41,7 @@ import java.util.List;
 import static android.view.View.GONE;
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
-public class WeatherFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<Weather>> {
+public class WeatherFragment extends Fragment implements LoaderManager.LoaderCallbacks<ContentValues[]> {
 
     // Constant value for the loader id
     private static final int WEATHER_LOADER_ID = 1;
@@ -186,31 +187,31 @@ public class WeatherFragment extends Fragment implements LoaderManager.LoaderCal
     }
 
     @Override
-    public Loader<List<Weather>> onCreateLoader(int id, Bundle args) {
+    public Loader<ContentValues[]> onCreateLoader(int id, Bundle args) {
         // Create a new loader and pass the bundle with coordinates
         return new WeatherLoader(getActivity(), mBundleCoordinates);
     }
 
     @Override
-    public void onLoadFinished(Loader<List<Weather>> loader, final List<Weather> data) {
+    public void onLoadFinished(Loader<ContentValues[]> loader, final ContentValues[] data) {
         View loadingIndicator = getActivity().findViewById(R.id.progress_bar);
         loadingIndicator.setVisibility(View.GONE);
 
         // Clear the adapter of previous data
         mWeatherAdapter.clearWeatherData();
 
-        if (data != null && !data.isEmpty()) {
+        if (data != null) {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    mWeatherAdapter.updateWeatherData(data);
+                    //mWeatherAdapter.updateWeatherData(data);
                 }
             });
         }
     }
 
     @Override
-    public void onLoaderReset(Loader<List<Weather>> loader) {
+    public void onLoaderReset(Loader<ContentValues[]> loader) {
         // On reset clear any existing data
         mWeatherAdapter.clearWeatherData();
     }

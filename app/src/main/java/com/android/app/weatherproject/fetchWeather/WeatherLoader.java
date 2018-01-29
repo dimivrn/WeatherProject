@@ -1,5 +1,6 @@
 package com.android.app.weatherproject.fetchWeather;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.content.AsyncTaskLoader;
@@ -12,7 +13,7 @@ import org.json.JSONException;
 import java.io.IOException;
 import java.util.List;
 
-public class WeatherLoader extends AsyncTaskLoader<List<Weather>> {
+public class WeatherLoader extends AsyncTaskLoader<ContentValues[]> {
 
     private String mlat, mlon, location;
 
@@ -31,7 +32,7 @@ public class WeatherLoader extends AsyncTaskLoader<List<Weather>> {
     }
 
     @Override
-    public List<Weather> loadInBackground() {
+    public ContentValues[] loadInBackground() {
         if (mlat == null && mlon == null) {
             return null;
         }

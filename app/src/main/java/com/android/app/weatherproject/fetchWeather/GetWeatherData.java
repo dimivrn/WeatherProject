@@ -1,10 +1,12 @@
 package com.android.app.weatherproject.fetchWeather;
 
+import android.content.ContentValues;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
 import com.android.app.weatherproject.BuildConfig;
 import com.android.app.weatherproject.data.Weather;
+import com.android.app.weatherproject.data.WeatherDataContract;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,7 +31,7 @@ import okhttp3.Response;
 final class GetWeatherData {
 
 
-    static List<Weather> fetchWeatherDataOk(String lat, String lon, final String location) throws IOException, JSONException {
+    static ContentValues[] fetchWeatherDataOk(String lat, String lon, final String location) throws IOException, JSONException {
 
         String language = "el";
         String units = "si";
@@ -71,7 +73,7 @@ final class GetWeatherData {
         return getDataFromJson(weatherResponse.body().string(), location);
     }
 
-    private static List<Weather> getDataFromJson(String jsonForecast, String location) throws JSONException {
+    private static ContentValues[] getDataFromJson(String jsonForecast, String location) throws JSONException {
 
         // The names of the Json object that will be extracted from the response
         final String CURR_DAY = "currently";
@@ -100,7 +102,8 @@ final class GetWeatherData {
         JSONObject dailyWeather = weatherForecast.getJSONObject(DAILY);
         JSONArray arrayDaily = dailyWeather.getJSONArray(DATA);
 
-        List<Weather> forecastsObjects = new ArrayList<>();
+        ContentValues[] weatherValues = new ContentValues[arrayDaily.length() + 1];
+
         for (int i = 1; i < arrayDaily.length(); i++) {
             long timeDaily;
             String summaryDaily, iconDaily;
@@ -117,13 +120,24 @@ final class GetWeatherData {
             minTempDaily = dayWeather.getDouble(MIN_TEMP);
             maxTempDaily = dayWeather.getDouble(MAX_TEMP);
 
-            Weather weatherObject = new Weather(timeDaily, summaryDaily, iconDaily, todayTemperature,
-                    minTempDaily, maxTempDaily);
-            forecastsObjects.add(weatherObject);
-        }
-        // Add the current weather object at first entry of ArrayList
-        forecastsObjects.add(0, new Weather(time, todaySummary, todayIcon, todayTemperature, location));
+            ContentValues values = new ContentValues();
+            values.put(WeatherDataContract.WeatherDataEntry.COLUMN_DATE, timeDaily);
+            values.put(WeatherDataContract.WeatherDataEntry.COLUMN_SUMMARY, summaryDaily);
+            values.put(WeatherDataContract.WeatherDataEntry.COLUMN_CURRENT_TEMP, todayTemperature);
+            values.put(WeatherDataContract.WeatherDataEntry.COLUMN_MIN_TEMP, minTempDaily);
+            values.put(WeatherDataContract.WeatherDataEntry.COLUMN_MAX_TEMP, maxTempDaily);
 
-        return forecastsObjects;
+            weatherValues[i] = values;
+        }
+
+        ContentValues currentValues = new ContentValues();
+        currentValues.put(WeatherDataContract.WeatherDataEntry.COLUMN_DATE, time);
+        currentValues.put(WeatherDataContract.WeatherDataEntry.COLUMN_SUMMARY, todaySummary);
+        currentValues.put(WeatherDataContract.WeatherDataEntry.COLUMN_CURRENT_TEMP, todayTemperature);
+        currentValues.put(WeatherDataContract.WeatherDataEntry.COLUMN_CURRENT_LOCATION, location);
+
+        weatherValues[0] = currentValues;
+
+        return weatherValues;
     }
 }
