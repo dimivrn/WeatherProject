@@ -1,6 +1,8 @@
-package com.android.app.weatherproject;
+package com.android.app.weatherproject.utils;
 
 import android.content.Context;
+
+import com.android.app.weatherproject.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -13,7 +15,7 @@ public class UtilsMethods {
      * @param temperature The temperature returned from the Weather items
      * @return The formatted temperature
      */
-    static String formatTemperature(Context context, double temperature) {
+    public static String formatTemperature(Context context, double temperature) {
 
         return context.getString(R.string.format_temperature, temperature);
     }
@@ -25,7 +27,7 @@ public class UtilsMethods {
 //
 //    }
 
-    static String getDate(long timeInMilliseconds) {
+    public static String getDate(long timeInMilliseconds) {
 
         Date dateObject = new Date(timeInMilliseconds);
 

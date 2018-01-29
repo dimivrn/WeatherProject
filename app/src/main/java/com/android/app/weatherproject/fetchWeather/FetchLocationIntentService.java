@@ -1,4 +1,4 @@
-package com.android.app.weatherproject;
+package com.android.app.weatherproject.fetchWeather;
 
 
 import android.app.IntentService;
@@ -11,6 +11,8 @@ import android.support.v4.os.ResultReceiver;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.android.app.weatherproject.R;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +22,7 @@ public class FetchLocationIntentService extends IntentService {
 
     private static final String LOG_TAG = FetchLocationIntentService.class.getSimpleName();
 
-    public ResultReceiver mReceiver;
+    public android.os.ResultReceiver mReceiver;
 
     public FetchLocationIntentService() {
         super("background");
@@ -28,8 +30,6 @@ public class FetchLocationIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        String error = "";
-
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
 
         // Get the location passed to this service through an extra.
@@ -55,7 +55,7 @@ public class FetchLocationIntentService extends IntentService {
             // Get only the city name from addresses
             Address address = addresses.get(0);
             String cityName = address.getLocality();
-            ArrayList<String> addressFragments = new ArrayList<String>();
+            ArrayList<String> addressFragments = new ArrayList<>();
 
             addressFragments.add(0, cityName);
 
@@ -76,7 +76,7 @@ public class FetchLocationIntentService extends IntentService {
     }
 
     // Define Constant class to contain the needed values
-    public final class Constants {
+    final class Constants {
         static final int SUCCESS_RESULT = 0;
         static final String PACKAGE_NAME =
                 "com.android.app.weatherproject";
