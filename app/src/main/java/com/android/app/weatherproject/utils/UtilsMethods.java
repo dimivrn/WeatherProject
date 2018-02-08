@@ -6,12 +6,12 @@ import com.android.app.weatherproject.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 public class UtilsMethods {
 
     /**
-     *
-     * @param context From context get access to the String resource id for Celcious formatting
+     * @param context     From context get access to the String resource id for Celcious formatting
      * @param temperature The temperature returned from the Weather items
      * @return The formatted temperature
      */
@@ -31,14 +31,14 @@ public class UtilsMethods {
 
         Date dateObject = new Date(timeInMilliseconds);
 
-        SimpleDateFormat dateFormatter = new SimpleDateFormat("dd MMMM");
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("dd MMMM", Locale.getDefault());
         return dateFormatter.format(dateObject);
     }
 
     public static int getListIcon(String icon) {
 
-        switch (icon){
-            case  "clear-day":
+        switch (icon) {
+            case "clear-day":
                 return R.drawable.ic_clear;
             case "clear-night":
                 return R.drawable.ic_clear;
@@ -67,8 +67,8 @@ public class UtilsMethods {
 
     public static int getCurrentIcon(String icon) {
 
-        switch (icon){
-            case  "clear-day":
+        switch (icon) {
+            case "clear-day":
                 return R.drawable.art_clear;
             case "clear-night":
                 return R.drawable.ic_clear;
