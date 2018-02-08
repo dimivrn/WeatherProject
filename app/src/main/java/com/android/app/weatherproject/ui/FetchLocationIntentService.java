@@ -1,4 +1,4 @@
-package com.android.app.weatherproject.fetchWeather;
+package com.android.app.weatherproject.ui;
 
 
 import android.app.IntentService;
@@ -7,7 +7,6 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.v4.os.ResultReceiver;
 import android.text.TextUtils;
 import android.util.Log;
 

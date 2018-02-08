@@ -1,10 +1,10 @@
-package com.android.app.weatherproject.fetchWeather;
+package com.android.app.weatherproject.ui.list;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.android.app.weatherproject.R;
-import com.android.app.weatherproject.fetchWeather.WeatherFragment;
+import com.android.app.weatherproject.ui.WeatherFragment;
 
 public class MainActivity extends AppCompatActivity {
 

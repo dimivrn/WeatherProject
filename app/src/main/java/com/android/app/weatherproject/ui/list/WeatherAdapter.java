@@ -1,4 +1,4 @@
-package com.android.app.weatherproject.fetchWeather;
+package com.android.app.weatherproject.ui.list;
 
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
@@ -25,7 +25,7 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherH
     private List<Weather> mWeatherList;
     private Context mContext;
 
-    WeatherAdapter(Context context, List<Weather> weatherList) {
+    public WeatherAdapter(Context context, List<Weather> weatherList) {
         mContext = context;
         mWeatherList = weatherList;
     }
@@ -72,12 +72,12 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherH
         }
     }
 
-    void updateWeatherData(List<Weather> updatedWeatherData) {
+    public void updateWeatherData(List<Weather> updatedWeatherData) {
         mWeatherList = updatedWeatherData;
         notifyDataSetChanged();
     }
 
-    void clearWeatherData() {
+    public void clearWeatherData() {
         mWeatherList.clear();
         notifyDataSetChanged();
     }

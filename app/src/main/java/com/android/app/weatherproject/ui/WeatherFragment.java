@@ -1,4 +1,4 @@
-package com.android.app.weatherproject.fetchWeather;
+package com.android.app.weatherproject.ui;
 
 
 import android.Manifest;
@@ -24,7 +24,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,15 +31,15 @@ import android.widget.TextView;
 
 import com.android.app.weatherproject.R;
 import com.android.app.weatherproject.data.Weather;
+import com.android.app.weatherproject.ui.list.WeatherAdapter;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import static android.view.View.GONE;
-import static com.android.app.weatherproject.fetchWeather.FetchLocationIntentService.Constants.LOCATION_DATA_EXTRA;
-import static com.android.app.weatherproject.fetchWeather.FetchLocationIntentService.Constants.RECEIVER;
+import static com.android.app.weatherproject.ui.FetchLocationIntentService.Constants.LOCATION_DATA_EXTRA;
+import static com.android.app.weatherproject.ui.FetchLocationIntentService.Constants.RECEIVER;
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
 public class WeatherFragment extends Fragment implements LoaderManager.LoaderCallbacks<ContentValues[]> {

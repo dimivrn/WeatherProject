@@ -1,29 +1,19 @@
-package com.android.app.weatherproject.fetchWeather;
+package com.android.app.weatherproject.ui;
 
 import android.content.ContentValues;
 import android.net.Uri;
-import android.support.annotation.NonNull;
 
 import com.android.app.weatherproject.BuildConfig;
-import com.android.app.weatherproject.data.Weather;
 import com.android.app.weatherproject.data.WeatherDataContract;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
-import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
