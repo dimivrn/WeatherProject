@@ -39,6 +39,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static android.view.View.GONE;
+import static com.android.app.weatherproject.fetchWeather.FetchLocationIntentService.Constants.LOCATION_DATA_EXTRA;
+import static com.android.app.weatherproject.fetchWeather.FetchLocationIntentService.Constants.RECEIVER;
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
 public class WeatherFragment extends Fragment implements LoaderManager.LoaderCallbacks<ContentValues[]> {
@@ -181,8 +183,8 @@ public class WeatherFragment extends Fragment implements LoaderManager.LoaderCal
 
     protected void startIntentService() {
         Intent intent = new Intent(getActivity(), FetchLocationIntentService.class);
-        intent.putExtra(FetchLocationIntentService.Constants.RECEIVER, mResultReceiver);
-        intent.putExtra(FetchLocationIntentService.Constants.LOCATION_DATA_EXTRA, mLastLocation);
+        intent.putExtra(RECEIVER, mResultReceiver);
+        intent.putExtra(LOCATION_DATA_EXTRA, mLastLocation);
         getActivity().startService(intent);
     }
 
