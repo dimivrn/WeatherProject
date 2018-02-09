@@ -18,5 +18,7 @@
     <dimen name="start_padding_parent_linear">16dp</dimen>
 
 
+    <dimen name="app_bar_height">360dp</dimen>
+
 
 </resources>

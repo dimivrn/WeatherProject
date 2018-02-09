@@ -24,10 +24,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.app.weatherproject.R;
+import com.android.app.weatherproject.data.Currently;
 import com.android.app.weatherproject.ui.FetchLocationIntentService;
+import com.android.app.weatherproject.utils.UtilsMethods;
 import com.android.app.weatherproject.viewmodel.WeatherListViewModel;
 import com.google.android.gms.location.FusedLocationProviderClient;
 
@@ -46,8 +49,10 @@ public class WeatherFragment extends Fragment {
     public AddressResultReceiver mResultReceiver = new AddressResultReceiver(new Handler());
     private View mLayout;
 
-    TextView mEmptyText;
-    WeatherAdapter mWeatherAdapter;
+    private TextView mCurrentDateTextView, mCurrentTempTextView, mCurrentSummaryTextView;
+    private TextView mEmptyText;
+    private WeatherAdapter mWeatherAdapter;
+    private ImageView mCurrentImageWeather;
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 199;
     final private int MY_REQUEST_ACCESS_FINE_LOCATION = 100;
@@ -90,6 +95,16 @@ public class WeatherFragment extends Fragment {
     }
 
     @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        mCurrentImageWeather = view.findViewById(R.id.current_weather_image);
+        mCurrentDateTextView = view.findViewById(R.id.current_date_text_view);
+        mCurrentTempTextView = view.findViewById(R.id.current_date_temp_text_view);
+        mCurrentSummaryTextView = view.findViewById(R.id.current_weather_summary_text_view);
+    }
+
+    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mFusedLocationClient = getFusedLocationProviderClient(getActivity());
@@ -124,7 +139,6 @@ public class WeatherFragment extends Fragment {
                         if (location != null) {
                             mLastLocation = location;
                             //startIntentService();
-
                             observeWeatherResponse(mWeatherListViewmodel);
                         }
 
@@ -139,11 +153,21 @@ public class WeatherFragment extends Fragment {
                 View loadingIndicator = getActivity().findViewById(R.id.progress_bar);
                 loadingIndicator.setVisibility(View.GONE);
 
+                setCurrentWeatherData(weatherResponseList.getCurrently());
+
                 //Clear the adapter of previous data
                 mWeatherAdapter.clearWeatherData();
                 mWeatherAdapter.updateWeatherData(weatherResponseList.getDaily().getData());
             }
         });
+    }
+
+    private void setCurrentWeatherData(Currently currentWeather) {
+
+        mCurrentImageWeather.setImageResource(UtilsMethods.getListIcon(currentWeather.getIcon()));
+        mCurrentDateTextView.setText(UtilsMethods.getDate(currentWeather.getTime() * 1000));
+        mCurrentTempTextView.setText(String.valueOf(UtilsMethods.formatTemperature(getActivity(), currentWeather.getTemperature())));
+        mCurrentSummaryTextView.setText(currentWeather.getSummary());
     }
 
     protected void startIntentService() {
@@ -202,16 +226,6 @@ public class WeatherFragment extends Fragment {
                 }
             }
         }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
     }
 
     public class AddressResultReceiver extends ResultReceiver {

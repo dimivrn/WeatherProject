@@ -23,7 +23,7 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherH
     private List<WeatherDay> mWeatherList;
     private Context mContext;
 
-    public WeatherAdapter(Context context, List<WeatherDay> weatherList) {
+    WeatherAdapter(Context context, List<WeatherDay> weatherList) {
         mContext = context;
         mWeatherList = weatherList;
     }
@@ -52,12 +52,12 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherH
     }
 
 
-    public void updateWeatherData(List<WeatherDay> updatedWeatherData) {
+    void updateWeatherData(List<WeatherDay> updatedWeatherData) {
         mWeatherList = updatedWeatherData;
         notifyDataSetChanged();
     }
 
-    public void clearWeatherData() {
+    void clearWeatherData() {
         mWeatherList.clear();
         notifyDataSetChanged();
     }
@@ -86,22 +86,14 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherH
 
         private void bindNormalData(WeatherDay weatherForecast) {
             String weatherIcon = weatherForecast.getIcon();
-            // Set the image
-            listIcon.setImageResource(UtilsMethods.getListIcon(weatherIcon));
 
-            // Read the date for the Weather object
+            listIcon.setImageResource(UtilsMethods.getListIcon(weatherIcon));
             long nextDate = weatherForecast.getTime();
             dateTextView.setText(UtilsMethods.getDate(nextDate * 1000));
-
-            // Get the summary of the day's weather
             String nextSummary = weatherForecast.getSummary();
             summaryTextView.setText(nextSummary);
-
-            // Get the minimum temperature for the day
             double minTemp = weatherForecast.getTemperatureMin();
             lowTempTextView.setText(String.valueOf(UtilsMethods.formatTemperature(mContext, minTemp)));
-
-            // Get the maximum temperature for the day
             double maxTemp = weatherForecast.getTemperatureMax();
             highTempTextView.setText(String.valueOf(UtilsMethods.formatTemperature(mContext, maxTemp)));
         }
