@@ -23,13 +23,6 @@ public class UtilsMethods {
         return context.getString(R.string.format_temperature, temperature);
     }
 
-//    public static String getFriendlyDayString(Context context, long date) {
-//
-//        Date today = Calendar.getInstance().getTime();
-//
-//
-//    }
-
     public static String getDate(long timeInMilliseconds) {
 
         Date dateObject = new Date(timeInMilliseconds);
@@ -354,7 +347,7 @@ public class UtilsMethods {
             case "clear-day":
                 return R.drawable.art_clear;
             case "clear-night":
-                return R.drawable.ic_clear;
+                return R.drawable.art_clear_night;
             case "rain":
                 return R.drawable.art_light_rain;
             case "snow":
@@ -370,7 +363,7 @@ public class UtilsMethods {
             case "partly-cloudy-day":
                 return R.drawable.art_light_clouds;
             case "partly-cloudy-night":
-                return R.drawable.art_light_clouds;
+                return R.drawable.art_night_clouds;
             default:
 
                 break;

@@ -164,7 +164,7 @@ public class WeatherFragment extends Fragment {
 
     private void setCurrentWeatherData(Currently currentWeather) {
 
-        mCurrentImageWeather.setImageResource(UtilsMethods.getListIcon(currentWeather.getIcon()));
+        mCurrentImageWeather.setImageResource(UtilsMethods.getCurrentIcon(currentWeather.getIcon()));
         mCurrentDateTextView.setText(UtilsMethods.getDate(currentWeather.getTime() * 1000));
         mCurrentTempTextView.setText(String.valueOf(UtilsMethods.formatTemperature(getActivity(), currentWeather.getTemperature())));
         mCurrentSummaryTextView.setText(currentWeather.getSummary());
