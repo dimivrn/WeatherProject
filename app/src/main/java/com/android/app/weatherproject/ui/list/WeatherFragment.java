@@ -3,6 +3,7 @@ package com.android.app.weatherproject.ui.list;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -30,9 +31,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.android.app.weatherproject.R;
-import com.android.app.weatherproject.data.Weather;
+import com.android.app.weatherproject.data.WeatherDay;
 import com.android.app.weatherproject.ui.FetchLocationIntentService;
-import com.android.app.weatherproject.ui.WeatherLoader;
+import com.android.app.weatherproject.viewmodel.WeatherListViewModel;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.tasks.OnSuccessListener;
 
@@ -43,45 +44,29 @@ import static com.android.app.weatherproject.ui.FetchLocationIntentService.Const
 import static com.android.app.weatherproject.ui.FetchLocationIntentService.Constants.RECEIVER;
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
-public class WeatherFragment extends Fragment implements LoaderManager.LoaderCallbacks<ContentValues[]> {
+public class WeatherFragment extends Fragment {
 
-    // Constant value for the loader id
     private static final int WEATHER_LOADER_ID = 1;
 
-    // The last known location returned
     private Location mLastLocation;
 
-    // The location returned from IntentService to ResultReceiver
     private String mLocationString;
-
-    // Result receiver to handle the response from FetchLocationIntentService
     public AddressResultReceiver mResultReceiver = new AddressResultReceiver(new Handler());
-
-    // Root of the layout of fragment
     private View mLayout;
 
-    // Bundle for storing and passing the coordinates to Loader
     private Bundle mBundleCoordinates;
-
-    // The coordinates of the user
     String lat, lon;
 
-    // No internet TextView
     TextView mEmptyText;
-
     LoaderManager manager;
 
-    // The array adapter to be used to fetch the data in UI
     WeatherAdapter mWeatherAdapter;
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 199;
-
-    // Tag for logging reasons
-    private static final String LOG_TAG = WeatherFragment.class.getSimpleName();
-
     final private int MY_REQUEST_ACCESS_FINE_LOCATION = 100;
-
     private FusedLocationProviderClient mFusedLocationClient;
+
+    private WeatherListViewModel mWeatherListViewmodel;
 
     public WeatherFragment() {
         // Required empty public constructor
@@ -91,13 +76,13 @@ public class WeatherFragment extends Fragment implements LoaderManager.LoaderCal
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View fragmentView = inflater.inflate(R.layout.fragment_weather, container, false);
+        View fragmentView = inflater.inflate(R.layout.fragment_weather_new, container, false);
 
         RecyclerView weatherList = fragmentView.findViewById(R.id.listView_weather);
-        mEmptyText = fragmentView.findViewById(R.id.empty_view);
+//        mEmptyText = fragmentView.findViewById(R.id.empty_view);
         weatherList.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        mWeatherAdapter = new WeatherAdapter(getActivity(), new ArrayList<Weather>());
+        mWeatherAdapter = new WeatherAdapter(getActivity(), new ArrayList<>());
 
         weatherList.setAdapter(mWeatherAdapter);
 
@@ -121,6 +106,8 @@ public class WeatherFragment extends Fragment implements LoaderManager.LoaderCal
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mFusedLocationClient = getFusedLocationProviderClient(getActivity());
+
+        mWeatherListViewmodel = ViewModelProviders.of(this).get(WeatherListViewModel.class);
     }
 
     @Override
@@ -151,12 +138,28 @@ public class WeatherFragment extends Fragment implements LoaderManager.LoaderCal
                         public void onSuccess(Location location) {
                             if (location != null) {
                                 mLastLocation = location;
-                                startIntentService();
+                                //startIntentService();
+
+                                observeWeatherResponse(mWeatherListViewmodel);
                             }
 
                         }
                     });
         }
+    }
+
+    private void observeWeatherResponse(WeatherListViewModel weatherListViewModel) {
+        weatherListViewModel.getObservableWeatherResponse(String.valueOf(mLastLocation.getLatitude()),
+                String.valueOf(mLastLocation.getLongitude())).observe(this, weatherResponseList -> {
+            if (weatherResponseList != null) {
+                View loadingIndicator = getActivity().findViewById(R.id.progress_bar);
+//                loadingIndicator.setVisibility(View.GONE);
+
+                //Clear the adapter of previous data
+                mWeatherAdapter.clearWeatherData();
+                mWeatherAdapter.updateWeatherData(weatherResponseList.getDaily().getData());
+            }
+        });
     }
 
     public void startLoader() {
@@ -174,11 +177,11 @@ public class WeatherFragment extends Fragment implements LoaderManager.LoaderCal
         mBundleCoordinates.putString("Longitude", lon);
         mBundleCoordinates.putString("Location", mLocationString);
 
-        manager = getActivity().getSupportLoaderManager();
-
-        // Initialize the Loader
-        manager.initLoader(WEATHER_LOADER_ID, null, this);
-        manager.restartLoader(WEATHER_LOADER_ID, null, this);
+//        manager = getActivity().getSupportLoaderManager();
+//
+//        // Initialize the Loader
+//        manager.initLoader(WEATHER_LOADER_ID, null, this);
+//        manager.restartLoader(WEATHER_LOADER_ID, null, this);
     }
 
     protected void startIntentService() {
@@ -188,35 +191,35 @@ public class WeatherFragment extends Fragment implements LoaderManager.LoaderCal
         getActivity().startService(intent);
     }
 
-    @Override
-    public Loader<ContentValues[]> onCreateLoader(int id, Bundle args) {
-        // Create a new loader and pass the bundle with coordinates
-        return new WeatherLoader(getActivity(), mBundleCoordinates);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<ContentValues[]> loader, final ContentValues[] data) {
-        View loadingIndicator = getActivity().findViewById(R.id.progress_bar);
-        loadingIndicator.setVisibility(View.GONE);
-
-        // Clear the adapter of previous data
-        mWeatherAdapter.clearWeatherData();
-
-        if (data != null) {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    //mWeatherAdapter.updateWeatherData(data);
-                }
-            });
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<ContentValues[]> loader) {
-        // On reset clear any existing data
-        mWeatherAdapter.clearWeatherData();
-    }
+//    @Override
+//    public Loader<ContentValues[]> onCreateLoader(int id, Bundle args) {
+//        // Create a new loader and pass the bundle with coordinates
+//        return new WeatherLoader(getActivity(), mBundleCoordinates);
+//    }
+//
+//    @Override
+//    public void onLoadFinished(Loader<ContentValues[]> loader, final ContentValues[] data) {
+//        View loadingIndicator = getActivity().findViewById(R.id.progress_bar);
+//        loadingIndicator.setVisibility(View.GONE);
+//
+//        // Clear the adapter of previous data
+//        mWeatherAdapter.clearWeatherData();
+//
+//        if (data != null) {
+//            getActivity().runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    //mWeatherAdapter.updateWeatherData(data);
+//                }
+//            });
+//        }
+//    }
+//
+//    @Override
+//    public void onLoaderReset(Loader<ContentValues[]> loader) {
+//        // On reset clear any existing data
+//        mWeatherAdapter.clearWeatherData();
+//    }
 
     private void checkLocationPermission() {
         if (ContextCompat.checkSelfPermission(getActivity(),

@@ -22,6 +22,10 @@ android {
     buildTypes.each {
         it.buildConfigField 'String', 'DARK_SKY_API_KEY', "\"d1e4f05c6095f8f0c17b532a305c5767\""
     }
+    compileOptions {
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
+    }
 }
 
 dependencies {

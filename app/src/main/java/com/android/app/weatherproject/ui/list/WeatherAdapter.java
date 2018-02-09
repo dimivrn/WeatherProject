@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.android.app.weatherproject.R;
 import com.android.app.weatherproject.data.Weather;
+import com.android.app.weatherproject.data.WeatherDay;
 import com.android.app.weatherproject.utils.UtilsMethods;
 
 import java.util.List;
@@ -22,10 +23,10 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherH
     private static final int ITEM_TYPE_HEADER = 0;
     private static final int ITEM_TYPE_NORMAL = 1;
 
-    private List<Weather> mWeatherList;
+    private List<WeatherDay> mWeatherList;
     private Context mContext;
 
-    public WeatherAdapter(Context context, List<Weather> weatherList) {
+    public WeatherAdapter(Context context, List<WeatherDay> weatherList) {
         mContext = context;
         mWeatherList = weatherList;
     }
@@ -45,7 +46,7 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherH
     @Override
     public void onBindViewHolder(WeatherHolder holder, int position) {
 
-        Weather weatherData = mWeatherList.get(position);
+        WeatherDay weatherData = mWeatherList.get(position);
 
         switch (holder.getItemViewType()) {
             case ITEM_TYPE_HEADER:
@@ -72,7 +73,7 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherH
         }
     }
 
-    public void updateWeatherData(List<Weather> updatedWeatherData) {
+    public void updateWeatherData(List<WeatherDay> updatedWeatherData) {
         mWeatherList = updatedWeatherData;
         notifyDataSetChanged();
     }
@@ -105,25 +106,25 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherH
             currentLocationTextView = itemView.findViewById(R.id.location_textView);
         }
 
-        private void bindHeaderData(Weather weatherForecast) {
-            String currentIconString = weatherForecast.getCurrentIcon();
+        private void bindHeaderData(WeatherDay weatherForecast) {
+            String currentIconString = weatherForecast.getIcon();
 
-            String currentLocation = weatherForecast.getLocation();
-            currentLocationTextView.setText(currentLocation);
+//            String currentLocation = weatherForecast.getLocation();
+//            currentLocationTextView.setText(currentLocation);
 
             LinearLayout linearLayoutBackground = itemView.findViewById(R.id.linear_current_background);
             linearLayoutBackground.setBackgroundColor(ContextCompat.getColor(mContext, R.color.colorPrimary));
 
             currentIcon.setImageResource(UtilsMethods.getCurrentIcon(currentIconString));
 
-            String currentText = weatherForecast.getCurrentSummary();
+            String currentText = weatherForecast.getSummary();
             currentSummaryTextView.setText(currentText);
 
-            long currentDate = weatherForecast.getCurrentDate();
-            currentDateTextView.setText(UtilsMethods.getDate(currentDate));
+            long currentDate = weatherForecast.getTime();
+            currentDateTextView.setText(UtilsMethods.getDate(currentDate * 1000));
 
-            double currentTemp = weatherForecast.getCurrentTemperature();
-            currentTemperatureTextView.setText(String.valueOf(UtilsMethods.formatTemperature(mContext, currentTemp)));
+//            double currentTemp = weatherForecast.getT();
+//            currentTemperatureTextView.setText(String.valueOf(UtilsMethods.formatTemperature(mContext, currentTemp)));
         }
     }
 
@@ -142,25 +143,25 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherH
             lowTempTextView = itemView.findViewById(R.id.item_low_temp);
         }
 
-        private void bindNormalData(Weather weatherForecast) {
+        private void bindNormalData(WeatherDay weatherForecast) {
             String weatherIcon = weatherForecast.getIcon();
             // Set the image
             listIcon.setImageResource(UtilsMethods.getListIcon(weatherIcon));
 
             // Read the date for the Weather object
-            long nextDate = weatherForecast.getDate();
-            dateTextView.setText(UtilsMethods.getDate(nextDate));
+            long nextDate = weatherForecast.getTime();
+            dateTextView.setText(UtilsMethods.getDate(nextDate * 1000));
 
             // Get the summary of the day's weather
             String nextSummary = weatherForecast.getSummary();
             summaryTextView.setText(nextSummary);
 
             // Get the minimum temperature for the day
-            double minTemp = weatherForecast.getMintemperature();
+            double minTemp = weatherForecast.getTemperatureMin();
             lowTempTextView.setText(String.valueOf(UtilsMethods.formatTemperature(mContext, minTemp)));
 
             // Get the maximum temperature for the day
-            double maxTemp = weatherForecast.getMaxTemperature();
+            double maxTemp = weatherForecast.getTemperatureMax();
             highTempTextView.setText(String.valueOf(UtilsMethods.formatTemperature(mContext, maxTemp)));
         }
     }

@@ -10,16 +10,12 @@ public class WeatherListViewModel extends ViewModel {
 
     private WeatherRepository mWeatherRepository;
 
-    private final LiveData<WeatherResponse> mWeatherResponse;
-
     public WeatherListViewModel() {
 
         mWeatherRepository = WeatherRepository.getInstance();
-
-        mWeatherResponse = mWeatherRepository.getWeatherDataResponse();
     }
 
-    public LiveData<WeatherResponse> getObservableWeatherResponse() {
-        return mWeatherResponse;
+    public LiveData<WeatherResponse> getObservableWeatherResponse(String lat, String lon) {
+        return mWeatherRepository.getWeatherDataResponse(lat, lon);
     }
 }

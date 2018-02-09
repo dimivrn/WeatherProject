@@ -41,11 +41,11 @@ public class WeatherRepository {
         return mWeatherRepository;
     }
 
-    public LiveData<WeatherResponse> getWeatherDataResponse() {
+    public LiveData<WeatherResponse> getWeatherDataResponse(String latitude, String longitude) {
 
         final MutableLiveData<WeatherResponse> weatherResponseLive = new MutableLiveData<>();
 
-        mWeatherService.getWeatherData(BuildConfig.DARK_SKY_API_KEY, , ).enqueue(new Callback<WeatherResponse>() {
+        mWeatherService.getWeatherData(BuildConfig.DARK_SKY_API_KEY, latitude, longitude).enqueue(new Callback<WeatherResponse>() {
             @Override
             public void onResponse(Call<WeatherResponse> call, Response<WeatherResponse> response) {
                 weatherResponseLive.setValue(response.body());
