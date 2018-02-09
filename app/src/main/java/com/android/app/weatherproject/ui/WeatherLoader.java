@@ -13,7 +13,7 @@ public class WeatherLoader extends AsyncTaskLoader<ContentValues[]> {
 
     private String mlat, mlon, location;
 
-    WeatherLoader(Context context, Bundle coordinates) {
+    public WeatherLoader(Context context, Bundle coordinates) {
         super(context);
         if (coordinates != null) {
             mlat = coordinates.getString("Latitude");

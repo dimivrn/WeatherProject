@@ -1,4 +1,4 @@
-package com.android.app.weatherproject.ui;
+package com.android.app.weatherproject.ui.list;
 
 
 import android.Manifest;
@@ -31,7 +31,8 @@ import android.widget.TextView;
 
 import com.android.app.weatherproject.R;
 import com.android.app.weatherproject.data.Weather;
-import com.android.app.weatherproject.ui.list.WeatherAdapter;
+import com.android.app.weatherproject.ui.FetchLocationIntentService;
+import com.android.app.weatherproject.ui.WeatherLoader;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.tasks.OnSuccessListener;
 

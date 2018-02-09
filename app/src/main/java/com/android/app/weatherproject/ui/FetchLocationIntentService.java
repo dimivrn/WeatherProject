@@ -75,14 +75,14 @@ public class FetchLocationIntentService extends IntentService {
     }
 
     // Define Constant class to contain the needed values
-    final class Constants {
-        static final int SUCCESS_RESULT = 0;
-        static final String PACKAGE_NAME =
+    public final class Constants {
+        public static final int SUCCESS_RESULT = 0;
+        public static final String PACKAGE_NAME =
                 "com.android.app.weatherproject";
-        static final String RECEIVER = PACKAGE_NAME + ".RECEIVER";
-        static final String RESULT_DATA_KEY = PACKAGE_NAME +
+        public static final String RECEIVER = PACKAGE_NAME + ".RECEIVER";
+        public static final String RESULT_DATA_KEY = PACKAGE_NAME +
                 ".RESULT_DATA_KEY";
-        static final String LOCATION_DATA_EXTRA = PACKAGE_NAME +
+        public static final String LOCATION_DATA_EXTRA = PACKAGE_NAME +
                 ".LOCATION_DATA_EXTRA";
     }
 }
