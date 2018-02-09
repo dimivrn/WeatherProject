@@ -25,7 +25,7 @@ final class GetWeatherData {
 
         String language = "el";
         String units = "si";
-        String exclude = "flags,hourly";
+        String exclude = "flags,hourly,minutely";
 
         Response weatherResponse;
 
