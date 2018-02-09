@@ -4,9 +4,7 @@ package com.android.app.weatherproject.ui.list;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -20,9 +18,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -31,11 +27,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.android.app.weatherproject.R;
-import com.android.app.weatherproject.data.WeatherDay;
 import com.android.app.weatherproject.ui.FetchLocationIntentService;
 import com.android.app.weatherproject.viewmodel.WeatherListViewModel;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
 
@@ -46,20 +40,13 @@ import static com.google.android.gms.location.LocationServices.getFusedLocationP
 
 public class WeatherFragment extends Fragment {
 
-    private static final int WEATHER_LOADER_ID = 1;
-
     private Location mLastLocation;
 
     private String mLocationString;
     public AddressResultReceiver mResultReceiver = new AddressResultReceiver(new Handler());
     private View mLayout;
 
-    private Bundle mBundleCoordinates;
-    String lat, lon;
-
     TextView mEmptyText;
-    LoaderManager manager;
-
     WeatherAdapter mWeatherAdapter;
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 199;
@@ -76,10 +63,10 @@ public class WeatherFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View fragmentView = inflater.inflate(R.layout.fragment_weather_new, container, false);
+        View fragmentView = inflater.inflate(R.layout.fragment_weather, container, false);
 
         RecyclerView weatherList = fragmentView.findViewById(R.id.listView_weather);
-//        mEmptyText = fragmentView.findViewById(R.id.empty_view);
+        mEmptyText = fragmentView.findViewById(R.id.empty_view);
         weatherList.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         mWeatherAdapter = new WeatherAdapter(getActivity(), new ArrayList<>());
@@ -133,17 +120,14 @@ public class WeatherFragment extends Fragment {
 
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
             mFusedLocationClient.getLastLocation()
-                    .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
-                        @Override
-                        public void onSuccess(Location location) {
-                            if (location != null) {
-                                mLastLocation = location;
-                                //startIntentService();
+                    .addOnSuccessListener(getActivity(), location -> {
+                        if (location != null) {
+                            mLastLocation = location;
+                            //startIntentService();
 
-                                observeWeatherResponse(mWeatherListViewmodel);
-                            }
-
+                            observeWeatherResponse(mWeatherListViewmodel);
                         }
+
                     });
         }
     }
@@ -153,7 +137,7 @@ public class WeatherFragment extends Fragment {
                 String.valueOf(mLastLocation.getLongitude())).observe(this, weatherResponseList -> {
             if (weatherResponseList != null) {
                 View loadingIndicator = getActivity().findViewById(R.id.progress_bar);
-//                loadingIndicator.setVisibility(View.GONE);
+                loadingIndicator.setVisibility(View.GONE);
 
                 //Clear the adapter of previous data
                 mWeatherAdapter.clearWeatherData();
@@ -162,64 +146,12 @@ public class WeatherFragment extends Fragment {
         });
     }
 
-    public void startLoader() {
-        // Start the service from here
-        if (mLastLocation != null) {
-//            startIntentService();
-
-            // Get the coordinates from last known location and pass the in Loader
-            lat = String.valueOf(mLastLocation.getLatitude());
-            lon = String.valueOf(mLastLocation.getLongitude());
-        }
-
-        mBundleCoordinates = new Bundle();
-        mBundleCoordinates.putString("Latitude", lat);
-        mBundleCoordinates.putString("Longitude", lon);
-        mBundleCoordinates.putString("Location", mLocationString);
-
-//        manager = getActivity().getSupportLoaderManager();
-//
-//        // Initialize the Loader
-//        manager.initLoader(WEATHER_LOADER_ID, null, this);
-//        manager.restartLoader(WEATHER_LOADER_ID, null, this);
-    }
-
     protected void startIntentService() {
         Intent intent = new Intent(getActivity(), FetchLocationIntentService.class);
         intent.putExtra(RECEIVER, mResultReceiver);
         intent.putExtra(LOCATION_DATA_EXTRA, mLastLocation);
         getActivity().startService(intent);
     }
-
-//    @Override
-//    public Loader<ContentValues[]> onCreateLoader(int id, Bundle args) {
-//        // Create a new loader and pass the bundle with coordinates
-//        return new WeatherLoader(getActivity(), mBundleCoordinates);
-//    }
-//
-//    @Override
-//    public void onLoadFinished(Loader<ContentValues[]> loader, final ContentValues[] data) {
-//        View loadingIndicator = getActivity().findViewById(R.id.progress_bar);
-//        loadingIndicator.setVisibility(View.GONE);
-//
-//        // Clear the adapter of previous data
-//        mWeatherAdapter.clearWeatherData();
-//
-//        if (data != null) {
-//            getActivity().runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    //mWeatherAdapter.updateWeatherData(data);
-//                }
-//            });
-//        }
-//    }
-//
-//    @Override
-//    public void onLoaderReset(Loader<ContentValues[]> loader) {
-//        // On reset clear any existing data
-//        mWeatherAdapter.clearWeatherData();
-//    }
 
     private void checkLocationPermission() {
         if (ContextCompat.checkSelfPermission(getActivity(),
@@ -236,14 +168,11 @@ public class WeatherFragment extends Fragment {
                 new AlertDialog.Builder(getActivity())
                         .setTitle(R.string.title_location_permission)
                         .setMessage(R.string.text_location_permission)
-                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                //Prompt the user once explanation has been shown
-                                ActivityCompat.requestPermissions(getActivity(),
-                                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                                        MY_PERMISSIONS_REQUEST_LOCATION);
-                            }
+                        .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
+                            //Prompt the user once explanation has been shown
+                            ActivityCompat.requestPermissions(getActivity(),
+                                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                    MY_PERMISSIONS_REQUEST_LOCATION);
                         })
                         .create()
                         .show();
@@ -297,8 +226,6 @@ public class WeatherFragment extends Fragment {
             // Show a toast message if an address was found.
             if (resultCode == FetchLocationIntentService.Constants.SUCCESS_RESULT) {
                 mLocationString = resultData.getString(FetchLocationIntentService.Constants.RESULT_DATA_KEY);
-
-                startLoader();
             }
         }
     }
