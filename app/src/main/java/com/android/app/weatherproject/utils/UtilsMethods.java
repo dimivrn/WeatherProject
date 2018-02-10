@@ -1,7 +1,10 @@
 package com.android.app.weatherproject.utils;
 
 import android.content.Context;
+import android.databinding.BindingAdapter;
+import android.graphics.drawable.Drawable;
 import android.text.format.DateUtils;
+import android.widget.ImageView;
 
 import com.android.app.weatherproject.R;
 
@@ -22,6 +25,7 @@ public class UtilsMethods {
 
         return context.getString(R.string.format_temperature, temperature);
     }
+
 
     public static String getDate(long timeInMilliseconds) {
 
@@ -311,34 +315,46 @@ public class UtilsMethods {
         }
     }
 
-    public static int getListIcon(String icon) {
+    @BindingAdapter({"android:src"})
+    public static void getListIcon(ImageView imageView, String icon) {
+
+        int selectedDrawable = 0;
 
         switch (icon) {
             case "clear-day":
-                return R.drawable.ic_clear;
+                selectedDrawable = R.drawable.ic_clear;
+                break;
             case "clear-night":
-                return R.drawable.ic_clear;
+                selectedDrawable = R.drawable.ic_clear;
+                break;
             case "rain":
-                return R.drawable.ic_light_rain;
+                selectedDrawable = R.drawable.ic_light_rain;
+                break;
             case "snow":
-                return R.drawable.ic_snow;
+                selectedDrawable = R.drawable.ic_snow;
+                break;
             case "sleet":
-                return R.drawable.ic_light_rain;
+                selectedDrawable = R.drawable.ic_light_rain;
+                break;
             case "wind":
-                return R.drawable.ic_cloudy;
+                selectedDrawable = R.drawable.ic_cloudy;
+                break;
             case "fog":
-                return R.drawable.ic_fog;
+                selectedDrawable = R.drawable.ic_fog;
+                break;
             case "cloudy":
-                return R.drawable.ic_cloudy;
+                selectedDrawable = R.drawable.ic_cloudy;
+                break;
             case "partly-cloudy-day":
-                return R.drawable.ic_light_clouds;
+                selectedDrawable = R.drawable.ic_light_clouds;
+                break;
             case "partly-cloudy-night":
-                return R.drawable.ic_light_clouds;
+                selectedDrawable = R.drawable.ic_light_clouds;
+                break;
             default:
-
                 break;
         }
-        return 0;
+        imageView.setImageResource(selectedDrawable);
     }
 
     public static int getCurrentIcon(String icon) {

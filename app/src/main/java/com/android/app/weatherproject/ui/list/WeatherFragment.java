@@ -155,8 +155,6 @@ public class WeatherFragment extends Fragment {
 
                 setCurrentWeatherData(weatherResponseList.getCurrently());
 
-                //Clear the adapter of previous data
-                mWeatherAdapter.clearWeatherData();
                 mWeatherAdapter.updateWeatherData(weatherResponseList.getDaily().getData());
             }
         });
