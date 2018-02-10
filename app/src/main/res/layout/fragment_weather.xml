@@ -32,40 +32,7 @@
                 android:scaleType="centerCrop"
                 app:layout_collapseMode="parallax">
 
-                <ImageView
-                    android:id="@+id/current_weather_image"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="100dp"
-                    android:layout_marginStart="24dp"/>
-
-                <TextView
-                    android:id="@+id/current_date_text_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="120dp"
-                    android:layout_toEndOf="@id/current_weather_image"
-                    android:textColor="@color/colorWhite" />
-
-                <TextView
-                    android:id="@+id/current_date_temp_text_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/current_date_text_view"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="6dp"
-                    android:layout_toEndOf="@id/current_weather_image"
-                    android:textColor="@color/colorWhite" />
-
-                <TextView
-                    android:id="@+id/current_weather_summary_text_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/current_date_temp_text_view"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="6dp"
-                    android:layout_toEndOf="@id/current_weather_image" />
+                <include layout="@layout/current_weather_layout"/>
 
             </RelativeLayout>
 
