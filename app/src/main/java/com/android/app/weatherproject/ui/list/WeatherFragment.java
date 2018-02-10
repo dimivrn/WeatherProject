@@ -7,6 +7,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.databinding.DataBindingUtil;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -29,12 +30,15 @@ import android.widget.TextView;
 
 import com.android.app.weatherproject.R;
 import com.android.app.weatherproject.data.Currently;
+import com.android.app.weatherproject.databinding.FragmentWeatherBinding;
 import com.android.app.weatherproject.ui.FetchLocationIntentService;
 import com.android.app.weatherproject.utils.UtilsMethodsBinding;
 import com.android.app.weatherproject.viewmodel.WeatherListViewModel;
 import com.google.android.gms.location.FusedLocationProviderClient;
 
 import java.util.ArrayList;
+
+import okhttp3.internal.Util;
 
 import static android.view.View.GONE;
 import static com.android.app.weatherproject.ui.FetchLocationIntentService.Constants.LOCATION_DATA_EXTRA;
@@ -60,6 +64,8 @@ public class WeatherFragment extends Fragment {
 
     private WeatherListViewModel mWeatherListViewmodel;
 
+    private FragmentWeatherBinding mBinding;
+
     public WeatherFragment() {
         // Required empty public constructor
     }
@@ -68,15 +74,14 @@ public class WeatherFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View fragmentView = inflater.inflate(R.layout.fragment_weather, container, false);
+//        View fragmentView = inflater.inflate(R.layout.fragment_weather, container, false);
+        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_weather, container, false);
 
-        RecyclerView weatherList = fragmentView.findViewById(R.id.listView_weather);
-        mEmptyText = fragmentView.findViewById(R.id.empty_view);
-        weatherList.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mBinding.listViewWeather.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        mWeatherAdapter = new WeatherAdapter(getActivity(), new ArrayList<>());
+        mWeatherAdapter = new WeatherAdapter(new ArrayList<>());
 
-        weatherList.setAdapter(mWeatherAdapter);
+        mBinding.listViewWeather.setAdapter(mWeatherAdapter);
 
         ConnectivityManager connManager = (ConnectivityManager)
                 getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -86,22 +91,21 @@ public class WeatherFragment extends Fragment {
             checkLocationPermission();
         } else {
             // There is no Internet connection so
-            View loadingIndicator = fragmentView.findViewById(R.id.progress_bar);
-            loadingIndicator.setVisibility(GONE);
+            mBinding.progressBar.setVisibility(GONE);
             // Show the no internet connection
-            mEmptyText.setText(R.string.no_internet_connection_string);
+            mBinding.emptyView.setText(R.string.no_internet_connection_string);
         }
-        return fragmentView;
+        return mBinding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mCurrentImageWeather = view.findViewById(R.id.current_weather_image);
-        mCurrentDateTextView = view.findViewById(R.id.current_date_text_view);
-        mCurrentTempTextView = view.findViewById(R.id.current_date_temp_text_view);
-        mCurrentSummaryTextView = view.findViewById(R.id.current_weather_summary_text_view);
+//        mCurrentImageWeather = view.findViewById(R.id.current_weather_image);
+//        mCurrentDateTextView = view.findViewById(R.id.current_date_text_view);
+//        mCurrentTempTextView = view.findViewById(R.id.current_date_temp_text_view);
+//        mCurrentSummaryTextView = view.findViewById(R.id.current_weather_summary_text_view);
     }
 
     @Override
@@ -150,22 +154,18 @@ public class WeatherFragment extends Fragment {
         weatherListViewModel.getObservableWeatherResponse(String.valueOf(mLastLocation.getLatitude()),
                 String.valueOf(mLastLocation.getLongitude())).observe(this, weatherResponseList -> {
             if (weatherResponseList != null) {
-                View loadingIndicator = getActivity().findViewById(R.id.progress_bar);
-                loadingIndicator.setVisibility(View.GONE);
-
+                mBinding.progressBar.setVisibility(GONE);
                 setCurrentWeatherData(weatherResponseList.getCurrently());
-
                 mWeatherAdapter.updateWeatherData(weatherResponseList.getDaily().getData());
             }
         });
     }
 
     private void setCurrentWeatherData(Currently currentWeather) {
-
-        //mCurrentImageWeather.setImageResource(UtilsMethodsBinding.setCurrentWeatherIcon(currentWeather.getIcon()));
-        //mCurrentDateTextView.setText(UtilsMethodsBinding.setWeatherTime(currentWeather.getTime() * 1000));
-        mCurrentTempTextView.setText(String.valueOf(UtilsMethodsBinding.formatTemperature(getActivity(), currentWeather.getTemperature())));
-        mCurrentSummaryTextView.setText(currentWeather.getSummary());
+        UtilsMethodsBinding.setCurrentWeatherIcon(mBinding.currentDayLayout.currentWeatherImage, currentWeather.getIcon());
+        UtilsMethodsBinding.setWeatherTime(mBinding.currentDayLayout.currentDateTextView, currentWeather.getTime());
+        mBinding.currentDayLayout.currentDateTempTextView.setText(UtilsMethodsBinding.formatTemperature(getActivity(), currentWeather.getTemperature()));
+        mBinding.currentDayLayout.currentWeatherSummaryTextView.setText(currentWeather.getSummary());
     }
 
     protected void startIntentService() {

@@ -58,7 +58,7 @@
                 android:id="@+id/item_high_temp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{String.valueOf(weatherDay.temperatureHigh)}"
+                android:text="@{String.format(@string/format_temperature, weatherDay.temperatureHigh)}"
                 android:textSize="@dimen/text_size_large" />
 
             <TextView
@@ -71,7 +71,7 @@
                 android:id="@+id/item_low_temp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{String.valueOf(weatherDay.temperatureLow)}"
+                android:text="@{String.format(@string/format_temperature, weatherDay.temperatureLow)}"
                 android:textSize="@dimen/text_size_large" />
 
         </LinearLayout>

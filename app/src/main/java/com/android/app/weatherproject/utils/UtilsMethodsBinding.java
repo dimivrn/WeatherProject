@@ -357,7 +357,7 @@ public class UtilsMethodsBinding {
         imageView.setImageResource(selectedDrawable);
     }
 
-//    @BindingAdapter({"android:src"})
+    @BindingAdapter({"currentIcon"})
     public static void setCurrentWeatherIcon(ImageView imageView, String icon) {
 
         int selectedDrawable = 0;

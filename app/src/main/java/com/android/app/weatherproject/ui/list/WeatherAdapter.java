@@ -1,6 +1,5 @@
 package com.android.app.weatherproject.ui.list;
 
-import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
@@ -17,10 +16,8 @@ import java.util.List;
 public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherHolder> {
 
     private List<WeatherDay> mWeatherList;
-    private Context mContext;
 
-    WeatherAdapter(Context context, List<WeatherDay> weatherList) {
-        mContext = context;
+    WeatherAdapter(List<WeatherDay> weatherList) {
         mWeatherList = weatherList;
     }
 
@@ -32,7 +29,6 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherH
                         parent, false);
 
         return new WeatherHolder(binding);
-
     }
 
     @Override
@@ -92,18 +88,4 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherH
             mBinding = binding;
         }
     }
-
-//        private void bindNormalData(WeatherDay weatherForecast) {
-//            String weatherIcon = weatherForecast.getIcon();
-//
-//            listIcon.setImageResource(UtilsMethodsBinding.setWeatherListIcon(weatherIcon));
-//            long nextDate = weatherForecast.getTime();
-//            dateTextView.setText(UtilsMethodsBinding.setWeatherTime(nextDate * 1000));
-//            String nextSummary = weatherForecast.getSummary();
-//            summaryTextView.setText(nextSummary);
-//            double minTemp = weatherForecast.getTemperatureMin();
-//            lowTempTextView.setText(String.valueOf(UtilsMethodsBinding.formatTemperature(mContext, minTemp)));
-//            double maxTemp = weatherForecast.getTemperatureMax();
-//            highTempTextView.setText(String.valueOf(UtilsMethodsBinding.formatTemperature(mContext, maxTemp)));
-//        }
 }
