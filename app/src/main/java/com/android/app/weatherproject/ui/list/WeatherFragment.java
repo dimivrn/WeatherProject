@@ -21,12 +21,10 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.android.app.weatherproject.R;
 import com.android.app.weatherproject.data.Currently;
@@ -38,102 +36,86 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 
 import java.util.ArrayList;
 
-import okhttp3.internal.Util;
-
 import static android.view.View.GONE;
+import static android.view.View.resolveSize;
 import static com.android.app.weatherproject.ui.FetchLocationIntentService.Constants.LOCATION_DATA_EXTRA;
 import static com.android.app.weatherproject.ui.FetchLocationIntentService.Constants.RECEIVER;
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
 public class WeatherFragment extends Fragment {
 
-    private Location mLastLocation;
-
-    private String mLocationString;
-    public AddressResultReceiver mResultReceiver = new AddressResultReceiver(new Handler());
-    private View mLayout;
-
-    private TextView mCurrentDateTextView, mCurrentTempTextView, mCurrentSummaryTextView;
-    private TextView mEmptyText;
-    private WeatherAdapter mWeatherAdapter;
-    private ImageView mCurrentImageWeather;
-
+    private static final String LOG_TAG = WeatherFragment.class.getSimpleName();
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 199;
     final private int MY_REQUEST_ACCESS_FINE_LOCATION = 100;
+
+    private Location mLastLocation;
+    public AddressResultReceiver mResultReceiver = new AddressResultReceiver(new Handler());
+
+    private WeatherAdapter mWeatherAdapter;
+
     private FusedLocationProviderClient mFusedLocationClient;
 
-    private WeatherListViewModel mWeatherListViewmodel;
+    private WeatherListViewModel mWeatherListViewModel;
 
     private FragmentWeatherBinding mBinding;
 
     public WeatherFragment() {
-        // Required empty public constructor
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-//        View fragmentView = inflater.inflate(R.layout.fragment_weather, container, false);
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_weather, container, false);
 
         mBinding.listViewWeather.setLayoutManager(new LinearLayoutManager(getActivity()));
-
         mWeatherAdapter = new WeatherAdapter(new ArrayList<>());
-
         mBinding.listViewWeather.setAdapter(mWeatherAdapter);
 
-        ConnectivityManager connManager = (ConnectivityManager)
-                getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connManager.getActiveNetworkInfo();
-
-        if (networkInfo != null && networkInfo.isConnected()) {
+        if (checkNetWorkConnection()) {
             checkLocationPermission();
         } else {
-            // There is no Internet connection so
             mBinding.progressBar.setVisibility(GONE);
-            // Show the no internet connection
             mBinding.emptyView.setText(R.string.no_internet_connection_string);
         }
         return mBinding.getRoot();
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-//        mCurrentImageWeather = view.findViewById(R.id.current_weather_image);
-//        mCurrentDateTextView = view.findViewById(R.id.current_date_text_view);
-//        mCurrentTempTextView = view.findViewById(R.id.current_date_temp_text_view);
-//        mCurrentSummaryTextView = view.findViewById(R.id.current_weather_summary_text_view);
-    }
-
-    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        //noinspection ConstantConditions
         mFusedLocationClient = getFusedLocationProviderClient(getActivity());
 
-        mWeatherListViewmodel = ViewModelProviders.of(this).get(WeatherListViewModel.class);
+        mWeatherListViewModel = ViewModelProviders.of(this).get(WeatherListViewModel.class);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        ConnectivityManager connManager = (ConnectivityManager)
-                getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connManager.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected()) {
+        if (checkNetWorkConnection()) {
             getLastLocation();
         } else {
-            // There is no Internet connection so
-            View loadingIndicator = getActivity().findViewById(R.id.progress_bar);
-            loadingIndicator.setVisibility(GONE);
-            // Show the no internet connection
-            mEmptyText.setText(R.string.no_internet_connection_string);
+            mBinding.progressBar.setVisibility(GONE);
+            mBinding.emptyView.setText(R.string.no_internet_connection_string);
         }
     }
 
+    /**
+     * Check if network connection is available
+     *
+     * @return true or false depending the situation
+     */
+    @SuppressWarnings("ConstantConditions")
+    private boolean checkNetWorkConnection() {
+        ConnectivityManager connManager = (ConnectivityManager)
+                getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connManager.getActiveNetworkInfo();
+
+        return networkInfo != null && networkInfo.isConnected();
+    }
+
     private void getLastLocation() {
+        @SuppressWarnings("ConstantConditions")
         int permissionCheck = ContextCompat.checkSelfPermission(getActivity(),
                 Manifest.permission.ACCESS_FINE_LOCATION);
 
@@ -143,7 +125,7 @@ public class WeatherFragment extends Fragment {
                         if (location != null) {
                             mLastLocation = location;
                             //startIntentService();
-                            observeWeatherResponse(mWeatherListViewmodel);
+                            observeWeatherResponse(mWeatherListViewModel);
                         }
 
                     });
@@ -162,9 +144,13 @@ public class WeatherFragment extends Fragment {
     }
 
     private void setCurrentWeatherData(Currently currentWeather) {
-        UtilsMethodsBinding.setCurrentWeatherIcon(mBinding.currentDayLayout.currentWeatherImage, currentWeather.getIcon());
-        UtilsMethodsBinding.setWeatherTime(mBinding.currentDayLayout.currentDateTextView, currentWeather.getTime());
-        mBinding.currentDayLayout.currentDateTempTextView.setText(UtilsMethodsBinding.formatTemperature(getActivity(), currentWeather.getTemperature()));
+        UtilsMethodsBinding.setCurrentWeatherIcon(
+                mBinding.currentDayLayout.currentWeatherImage, currentWeather.getIcon());
+        UtilsMethodsBinding.setWeatherTime(
+                mBinding.currentDayLayout.currentDateTextView, currentWeather.getTime());
+
+        mBinding.currentDayLayout.currentDateTempTextView.setText(
+                UtilsMethodsBinding.formatTemperature(getActivity(), currentWeather.getTemperature()));
         mBinding.currentDayLayout.currentWeatherSummaryTextView.setText(currentWeather.getSummary());
     }
 
@@ -219,8 +205,7 @@ public class WeatherFragment extends Fragment {
                         getLastLocation();
                     }
                 } else {
-                    Snackbar.make(mLayout, R.string.location_permission_not_granted,
-                            Snackbar.LENGTH_SHORT).show();
+                    Log.i(LOG_TAG, getString(R.string.location_permission_not_granted));
                 }
             }
         }
@@ -234,7 +219,7 @@ public class WeatherFragment extends Fragment {
 
         @Override
         protected void onReceiveResult(int resultCode, Bundle resultData) {
-
+            String mLocationString;
             // Show a toast message if an address was found.
             if (resultCode == FetchLocationIntentService.Constants.SUCCESS_RESULT) {
                 mLocationString = resultData.getString(FetchLocationIntentService.Constants.RESULT_DATA_KEY);
