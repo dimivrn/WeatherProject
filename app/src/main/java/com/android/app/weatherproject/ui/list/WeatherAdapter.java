@@ -96,14 +96,14 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherH
 //        private void bindNormalData(WeatherDay weatherForecast) {
 //            String weatherIcon = weatherForecast.getIcon();
 //
-//            listIcon.setImageResource(UtilsMethods.getListIcon(weatherIcon));
+//            listIcon.setImageResource(UtilsMethodsBinding.setWeatherListIcon(weatherIcon));
 //            long nextDate = weatherForecast.getTime();
-//            dateTextView.setText(UtilsMethods.getDate(nextDate * 1000));
+//            dateTextView.setText(UtilsMethodsBinding.setWeatherTime(nextDate * 1000));
 //            String nextSummary = weatherForecast.getSummary();
 //            summaryTextView.setText(nextSummary);
 //            double minTemp = weatherForecast.getTemperatureMin();
-//            lowTempTextView.setText(String.valueOf(UtilsMethods.formatTemperature(mContext, minTemp)));
+//            lowTempTextView.setText(String.valueOf(UtilsMethodsBinding.formatTemperature(mContext, minTemp)));
 //            double maxTemp = weatherForecast.getTemperatureMax();
-//            highTempTextView.setText(String.valueOf(UtilsMethods.formatTemperature(mContext, maxTemp)));
+//            highTempTextView.setText(String.valueOf(UtilsMethodsBinding.formatTemperature(mContext, maxTemp)));
 //        }
 }

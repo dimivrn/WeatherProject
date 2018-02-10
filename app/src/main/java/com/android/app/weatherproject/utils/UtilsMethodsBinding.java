@@ -2,9 +2,9 @@ package com.android.app.weatherproject.utils;
 
 import android.content.Context;
 import android.databinding.BindingAdapter;
-import android.graphics.drawable.Drawable;
 import android.text.format.DateUtils;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.android.app.weatherproject.R;
 
@@ -14,7 +14,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
-public class UtilsMethods {
+public class UtilsMethodsBinding {
 
     /**
      * @param context     From context get access to the String resource id for Celcious formatting
@@ -26,15 +26,15 @@ public class UtilsMethods {
         return context.getString(R.string.format_temperature, temperature);
     }
 
+    @BindingAdapter("weatherTime")
+    public static void setWeatherTime(TextView weatherTextView, long timeInMilliseconds) {
 
-    public static String getDate(long timeInMilliseconds) {
-
-        Date dateObject = new Date(timeInMilliseconds);
+        Date dateObject = new Date(timeInMilliseconds * 1000);
 
         SimpleDateFormat dateFormatter = new SimpleDateFormat("dd MMMM", Locale.getDefault());
         dateFormatter.setTimeZone(TimeZone.getTimeZone("GMT+2"));
 
-        return dateFormatter.format(dateObject);
+        weatherTextView.setText(dateFormatter.format(dateObject));
     }
 
     /* Milliseconds in a day */
@@ -316,7 +316,7 @@ public class UtilsMethods {
     }
 
     @BindingAdapter({"android:src"})
-    public static void getListIcon(ImageView imageView, String icon) {
+    public static void setWeatherListIcon(ImageView imageView, String icon) {
 
         int selectedDrawable = 0;
 
@@ -357,33 +357,45 @@ public class UtilsMethods {
         imageView.setImageResource(selectedDrawable);
     }
 
-    public static int getCurrentIcon(String icon) {
+//    @BindingAdapter({"android:src"})
+    public static void setCurrentWeatherIcon(ImageView imageView, String icon) {
+
+        int selectedDrawable = 0;
 
         switch (icon) {
             case "clear-day":
-                return R.drawable.art_clear;
+                selectedDrawable = R.drawable.art_clear;
+                break;
             case "clear-night":
-                return R.drawable.art_clear_night;
+                selectedDrawable = R.drawable.art_clear_night;
+                break;
             case "rain":
-                return R.drawable.art_light_rain;
+                selectedDrawable = R.drawable.art_light_rain;
+                break;
             case "snow":
-                return R.drawable.art_snow;
+                selectedDrawable = R.drawable.art_snow;
+                break;
             case "sleet":
-                return R.drawable.art_light_rain;
+                selectedDrawable = R.drawable.art_light_rain;
+                break;
             case "wind":
-                return R.drawable.art_clouds;
+                selectedDrawable = R.drawable.art_clouds;
+                break;
             case "fog":
-                return R.drawable.art_fog;
+                selectedDrawable = R.drawable.art_fog;
+                break;
             case "cloudy":
-                return R.drawable.art_clouds;
+                selectedDrawable = R.drawable.art_clouds;
+                break;
             case "partly-cloudy-day":
-                return R.drawable.art_light_clouds;
+                selectedDrawable = R.drawable.art_light_clouds;
+                break;
             case "partly-cloudy-night":
-                return R.drawable.art_night_clouds;
+                selectedDrawable = R.drawable.art_night_clouds;
+                break;
             default:
-
                 break;
         }
-        return 0;
+        imageView.setImageResource(selectedDrawable);
     }
 }

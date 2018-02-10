@@ -4,9 +4,8 @@
 
     <data>
         <variable
-            name="weatherDay" type="com.android.app.weatherproject.data.WeatherDay" />
-        <variable
-            name="utils" type="com.android.app.weatherproject.utils.UtilsMethods"/>
+            name="weatherDay"
+            type="com.android.app.weatherproject.data.WeatherDay" />
     </data>
 
     <LinearLayout
@@ -21,7 +20,7 @@
             android:id="@+id/list_item_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@{weatherDay.icon}"/>
+            android:src="@{weatherDay.icon}" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -36,8 +35,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@android:color/black"
-                android:text="@{String.valueOf(weatherDay.time)}"
-                android:textSize="@dimen/text_size_normal" />
+                android:textSize="@dimen/text_size_normal"
+                app:weatherTime="@{weatherDay.time}"/>
 
             <TextView
                 android:id="@+id/list_summary_textView"

@@ -30,7 +30,7 @@ import android.widget.TextView;
 import com.android.app.weatherproject.R;
 import com.android.app.weatherproject.data.Currently;
 import com.android.app.weatherproject.ui.FetchLocationIntentService;
-import com.android.app.weatherproject.utils.UtilsMethods;
+import com.android.app.weatherproject.utils.UtilsMethodsBinding;
 import com.android.app.weatherproject.viewmodel.WeatherListViewModel;
 import com.google.android.gms.location.FusedLocationProviderClient;
 
@@ -162,9 +162,9 @@ public class WeatherFragment extends Fragment {
 
     private void setCurrentWeatherData(Currently currentWeather) {
 
-        mCurrentImageWeather.setImageResource(UtilsMethods.getCurrentIcon(currentWeather.getIcon()));
-        mCurrentDateTextView.setText(UtilsMethods.getDate(currentWeather.getTime() * 1000));
-        mCurrentTempTextView.setText(String.valueOf(UtilsMethods.formatTemperature(getActivity(), currentWeather.getTemperature())));
+        //mCurrentImageWeather.setImageResource(UtilsMethodsBinding.setCurrentWeatherIcon(currentWeather.getIcon()));
+        //mCurrentDateTextView.setText(UtilsMethodsBinding.setWeatherTime(currentWeather.getTime() * 1000));
+        mCurrentTempTextView.setText(String.valueOf(UtilsMethodsBinding.formatTemperature(getActivity(), currentWeather.getTemperature())));
         mCurrentSummaryTextView.setText(currentWeather.getSummary());
     }
 
