@@ -2,6 +2,7 @@ package com.android.app.weatherproject.ui.list;
 
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -53,8 +54,38 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherH
 
 
     void updateWeatherData(List<WeatherDay> updatedWeatherData) {
-        mWeatherList = updatedWeatherData;
-        notifyDataSetChanged();
+        if (mWeatherList == null) {
+            mWeatherList = updatedWeatherData;
+            notifyItemRangeInserted(0, updatedWeatherData.size());
+        } else {
+            DiffUtil.DiffResult result = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+                @Override
+                public int getOldListSize() {
+                    return mWeatherList.size();
+                }
+
+                @Override
+                public int getNewListSize() {
+                    return updatedWeatherData.size();
+                }
+
+                @Override
+                public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+                    return mWeatherList.get(oldItemPosition).getTime().equals(
+                            updatedWeatherData.get(newItemPosition).getTime());
+                }
+
+                @Override
+                public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+                    WeatherDay weatherDay = updatedWeatherData.get(newItemPosition);
+                    WeatherDay oldWeatherDay = updatedWeatherData.get(oldItemPosition);
+                    return weatherDay.getTime().equals(oldWeatherDay.getTime()) &&
+                            weatherDay.getSummary() == oldWeatherDay.getSummary();
+                }
+            });
+            mWeatherList = updatedWeatherData;
+            result.dispatchUpdatesTo(this);
+        }
     }
 
     void clearWeatherData() {
