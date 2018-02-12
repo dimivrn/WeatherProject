@@ -101,12 +101,8 @@ public class WeatherFragment extends Fragment {
         }
     }
 
-    private final WeatherAdapter.WeatherClickListener weatherClickListener = new WeatherAdapter.WeatherClickListener() {
-        @Override
-        public void onClick(WeatherDay weatherDay) {
+    private final WeatherAdapter.WeatherClickListener weatherClickListener = weatherDay ->
             Log.i(LOG_TAG, "CLICK LISTENER ENABLED");
-        }
-    };
 
     /**
      * Check if network connection is available

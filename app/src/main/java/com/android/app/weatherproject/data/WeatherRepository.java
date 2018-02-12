@@ -2,8 +2,10 @@ package com.android.app.weatherproject.data;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.content.Context;
 
 import com.android.app.weatherproject.BuildConfig;
+import com.android.app.weatherproject.data.network.WeatherNetworkDataSource;
 import com.android.app.weatherproject.data.network.WeatherService;
 
 import retrofit2.Call;
@@ -18,45 +20,44 @@ public class WeatherRepository {
 
     private static WeatherRepository mWeatherRepository;
     private static final Object LOCK = new Object();
+    private WeatherNetworkDataSource mWeatherNetworkDataSource;
 
     private WeatherService mWeatherService;
 
-    private WeatherRepository() {
+    private boolean mInitialized = false;
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_WEATHER_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
+    private WeatherRepository(Context context) {
 
-        mWeatherService = retrofit.create(WeatherService.class);
+        mWeatherNetworkDataSource = WeatherNetworkDataSource.getInstance(context);
+
     }
 
-    public synchronized static WeatherRepository getInstance() {
+    public synchronized static WeatherRepository getInstance(Context context) {
 
         if (mWeatherRepository == null) {
             synchronized (LOCK) {
-                mWeatherRepository = new WeatherRepository();
+                mWeatherRepository = new WeatherRepository(context);
             }
         }
         return mWeatherRepository;
     }
 
     public LiveData<WeatherResponse> getWeatherDataResponse(String latitude, String longitude) {
+        initializeData(latitude, longitude);
 
-        final MutableLiveData<WeatherResponse> weatherResponseLive = new MutableLiveData<>();
-
-        mWeatherService.getWeatherData(BuildConfig.DARK_SKY_API_KEY, latitude, longitude).enqueue(new Callback<WeatherResponse>() {
-            @Override
-            public void onResponse(Call<WeatherResponse> call, Response<WeatherResponse> response) {
-                weatherResponseLive.setValue(response.body());
-            }
-
-            @Override
-            public void onFailure(Call<WeatherResponse> call, Throwable t) {
-                weatherResponseLive.setValue(null);
-            }
-        });
-        return weatherResponseLive;
+        return mWeatherNetworkDataSource.getFetchedWeatherForecasts();
     }
 
+    private synchronized void initializeData(String latitude, String longitude) {
+
+        // Initialization once per app lifetime
+        if (mInitialized) return;
+        mInitialized = true;
+
+        startFetchWeatherService(latitude, longitude);
+    }
+
+    private void startFetchWeatherService(String latitude, String longitude) {
+        mWeatherNetworkDataSource.startFetchWeatherService(latitude, longitude);
+    }
 }

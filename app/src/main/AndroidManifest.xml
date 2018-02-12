@@ -22,6 +22,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service android:name=".data.network.FetchWeatherService"
+                android:exported="false" />
         <service
             android:name=".ui.FetchLocationIntentService"
             android:exported="false"/>
