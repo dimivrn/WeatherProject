@@ -7,7 +7,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import com.android.app.weatherproject.R;
-import com.android.app.weatherproject.data.WeatherDay;
+import com.android.app.weatherproject.data.model.WeatherDay;
 import com.android.app.weatherproject.databinding.ListItemForecastBinding;
 
 import java.util.List;

@@ -1,28 +1,16 @@
 package com.android.app.weatherproject.data;
 
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 
-import com.android.app.weatherproject.BuildConfig;
+import com.android.app.weatherproject.data.model.WeatherResponse;
 import com.android.app.weatherproject.data.network.WeatherNetworkDataSource;
-import com.android.app.weatherproject.data.network.WeatherService;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-
-import static com.android.app.weatherproject.data.network.WeatherService.BASE_WEATHER_URL;
 
 public class WeatherRepository {
 
     private static WeatherRepository mWeatherRepository;
     private static final Object LOCK = new Object();
     private WeatherNetworkDataSource mWeatherNetworkDataSource;
-
-    private WeatherService mWeatherService;
 
     private boolean mInitialized = false;
 

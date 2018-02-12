@@ -1,4 +1,4 @@
-package com.android.app.weatherproject.data;
+package com.android.app.weatherproject.data.model;
 
 
 import com.google.gson.annotations.Expose;

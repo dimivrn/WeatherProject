@@ -16,7 +16,6 @@ import android.os.Handler;
 import android.os.ResultReceiver;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -27,18 +26,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.android.app.weatherproject.R;
-import com.android.app.weatherproject.data.Currently;
-import com.android.app.weatherproject.data.WeatherDay;
+import com.android.app.weatherproject.data.model.Currently;
 import com.android.app.weatherproject.databinding.FragmentWeatherBinding;
 import com.android.app.weatherproject.ui.FetchLocationIntentService;
 import com.android.app.weatherproject.utils.UtilsMethodsBinding;
 import com.android.app.weatherproject.viewmodel.WeatherListViewModel;
 import com.google.android.gms.location.FusedLocationProviderClient;
 
-import java.util.ArrayList;
-
 import static android.view.View.GONE;
-import static android.view.View.resolveSize;
 import static com.android.app.weatherproject.ui.FetchLocationIntentService.Constants.LOCATION_DATA_EXTRA;
 import static com.android.app.weatherproject.ui.FetchLocationIntentService.Constants.RECEIVER;
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;

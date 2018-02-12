@@ -5,7 +5,7 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 
 import com.android.app.weatherproject.data.WeatherRepository;
-import com.android.app.weatherproject.data.WeatherResponse;
+import com.android.app.weatherproject.data.model.WeatherResponse;
 
 public class WeatherListViewModel extends AndroidViewModel {
 

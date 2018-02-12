@@ -6,7 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.android.app.weatherproject.BuildConfig;
-import com.android.app.weatherproject.data.WeatherResponse;
+import com.android.app.weatherproject.data.model.WeatherResponse;
 
 import retrofit2.Call;
 import retrofit2.Callback;

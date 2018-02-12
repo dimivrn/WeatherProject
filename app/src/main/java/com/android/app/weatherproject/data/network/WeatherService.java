@@ -1,6 +1,6 @@
 package com.android.app.weatherproject.data.network;
 
-import com.android.app.weatherproject.data.WeatherResponse;
+import com.android.app.weatherproject.data.model.WeatherResponse;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
