@@ -17,8 +17,10 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherH
 
     private List<WeatherDay> mWeatherList;
 
-    WeatherAdapter(List<WeatherDay> weatherList) {
-        mWeatherList = weatherList;
+    private WeatherClickListener mOnWeatherClickListener;
+
+    WeatherAdapter(WeatherClickListener weatherClickListener) {
+        mOnWeatherClickListener = weatherClickListener;
     }
 
     @Override
@@ -27,6 +29,8 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherH
         ListItemForecastBinding binding = DataBindingUtil
                 .inflate(LayoutInflater.from(parent.getContext()), R.layout.list_item_forecast,
                         parent, false);
+
+        binding.setClickCallback(mOnWeatherClickListener);
 
         return new WeatherHolder(binding);
     }
@@ -40,7 +44,7 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherH
 
     @Override
     public int getItemCount() {
-        return mWeatherList.size();
+        return mWeatherList == null ? 0 : mWeatherList.size();
     }
 
 
@@ -87,5 +91,9 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherH
             super(binding.getRoot());
             mBinding = binding;
         }
+    }
+
+    public interface WeatherClickListener {
+        void onClick(WeatherDay weatherDay);
     }
 }

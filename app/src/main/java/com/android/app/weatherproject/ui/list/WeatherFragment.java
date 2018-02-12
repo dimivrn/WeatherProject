@@ -28,6 +28,7 @@ import android.view.ViewGroup;
 
 import com.android.app.weatherproject.R;
 import com.android.app.weatherproject.data.Currently;
+import com.android.app.weatherproject.data.WeatherDay;
 import com.android.app.weatherproject.databinding.FragmentWeatherBinding;
 import com.android.app.weatherproject.ui.FetchLocationIntentService;
 import com.android.app.weatherproject.utils.UtilsMethodsBinding;
@@ -68,7 +69,7 @@ public class WeatherFragment extends Fragment {
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_weather, container, false);
 
         mBinding.listViewWeather.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mWeatherAdapter = new WeatherAdapter(new ArrayList<>());
+        mWeatherAdapter = new WeatherAdapter(weatherClickListener);
         mBinding.listViewWeather.setAdapter(mWeatherAdapter);
 
         if (checkNetWorkConnection()) {
@@ -99,6 +100,13 @@ public class WeatherFragment extends Fragment {
             mBinding.emptyView.setText(R.string.no_internet_connection_string);
         }
     }
+
+    private final WeatherAdapter.WeatherClickListener weatherClickListener = new WeatherAdapter.WeatherClickListener() {
+        @Override
+        public void onClick(WeatherDay weatherDay) {
+            Log.i(LOG_TAG, "CLICK LISTENER ENABLED");
+        }
+    };
 
     /**
      * Check if network connection is available

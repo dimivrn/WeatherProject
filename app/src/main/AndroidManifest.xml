@@ -25,6 +25,7 @@
         <service
             android:name=".ui.FetchLocationIntentService"
             android:exported="false"/>
+        <activity android:name=".ui.detail.WeatherDetailActivity" />
     </application>
 
 </manifest>
