@@ -69,9 +69,6 @@ public class WeatherFragment extends Fragment {
 
         if (checkNetWorkConnection()) {
             checkLocationPermission();
-        } else {
-            mBinding.progressBar.setVisibility(GONE);
-            mBinding.emptyView.setText(R.string.no_internet_connection_string);
         }
         return mBinding.getRoot();
     }
@@ -90,9 +87,6 @@ public class WeatherFragment extends Fragment {
         super.onResume();
         if (checkNetWorkConnection()) {
             getLastLocation();
-        } else {
-            mBinding.progressBar.setVisibility(GONE);
-            mBinding.emptyView.setText(R.string.no_internet_connection_string);
         }
     }
 
@@ -134,7 +128,6 @@ public class WeatherFragment extends Fragment {
         weatherListViewModel.getObservableWeatherResponse(String.valueOf(mLastLocation.getLatitude()),
                 String.valueOf(mLastLocation.getLongitude())).observe(this, weatherResponseList -> {
             if (weatherResponseList != null) {
-                mBinding.progressBar.setVisibility(GONE);
                 setCurrentWeatherData(weatherResponseList.getCurrently());
                 mWeatherAdapter.updateWeatherData(weatherResponseList.getDaily().getData());
             }
