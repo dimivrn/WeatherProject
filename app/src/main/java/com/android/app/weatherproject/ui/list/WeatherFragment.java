@@ -126,7 +126,6 @@ public class WeatherFragment extends Fragment {
                             //startIntentService();
                             observeWeatherResponse(mWeatherListViewModel);
                         }
-
                     });
         }
     }

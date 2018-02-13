@@ -1,11 +1,18 @@
 package com.android.app.weatherproject.data.model;
 
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Index;
+import android.arch.persistence.room.PrimaryKey;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+@Entity(tableName = "weather_daily", indices = {@Index(value = {"date"}, unique = true)})
 public class WeatherDay {
 
+    @PrimaryKey(autoGenerate = true)
+    private int id;
     @SerializedName("time")
     @Expose
     private Integer time;
@@ -126,6 +133,14 @@ public class WeatherDay {
     @SerializedName("apparentTemperatureMaxTime")
     @Expose
     private Integer apparentTemperatureMaxTime;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public Integer getTime() {
         return time;
