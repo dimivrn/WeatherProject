@@ -8,7 +8,7 @@ import android.content.Context;
 
 import com.android.app.weatherproject.data.model.WeatherDay;
 
-@Database(entities = {WeatherDay.class}, version = 1)
+@Database(entities = {WeatherDay.class}, version = 3)
 @TypeConverters(DateConverter.class)
 public abstract class WeatherDatabase extends RoomDatabase {
 
@@ -23,7 +23,9 @@ public abstract class WeatherDatabase extends RoomDatabase {
         if (mDatabaseInstance == null) {
             synchronized (LOCK) {
                 mDatabaseInstance = Room.databaseBuilder(context.getApplicationContext(),
-                        WeatherDatabase.class, WeatherDatabase.DATABASE_NAME).build();
+                        WeatherDatabase.class, WeatherDatabase.DATABASE_NAME)
+                        .fallbackToDestructiveMigration()
+                        .build();
             }
         }
         return mDatabaseInstance;

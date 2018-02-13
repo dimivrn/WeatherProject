@@ -6,8 +6,11 @@ import android.content.Context;
 import com.android.app.weatherproject.AppExecutors;
 import com.android.app.weatherproject.data.database.WeatherDAO;
 import com.android.app.weatherproject.data.database.WeatherDatabase;
+import com.android.app.weatherproject.data.model.WeatherDay;
 import com.android.app.weatherproject.data.model.WeatherResponse;
 import com.android.app.weatherproject.data.network.WeatherNetworkDataSource;
+
+import java.util.List;
 
 public class WeatherRepository {
 
@@ -24,10 +27,6 @@ public class WeatherRepository {
         mWeatherNetworkDataSource = WeatherNetworkDataSource.getInstance(context);
         mAppExecutors = AppExecutors.getInstance();
         mWeatherDao = WeatherDatabase.getInstance(context).weatherDAO();
-
-        LiveData<WeatherResponse> weatherData = mWeatherNetworkDataSource.getFetchedWeatherForecasts();
-        weatherData.observeForever(weatherResponse -> mAppExecutors.diskIO().execute(() ->
-                mWeatherDao.bulkInsert(weatherResponse.getDaily().getData())));
     }
 
     public synchronized static WeatherRepository getInstance(Context context) {

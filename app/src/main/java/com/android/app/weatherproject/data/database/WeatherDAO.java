@@ -19,4 +19,7 @@ public interface WeatherDAO {
 
     @Query("SELECT * FROM weather_daily WHERE time= :date")
     LiveData<WeatherDay> getWeatherByDate(Date date);
+
+    @Query("SELECT * FROM weather_daily")
+    LiveData<List<WeatherDay>> getWeatherData();
 }

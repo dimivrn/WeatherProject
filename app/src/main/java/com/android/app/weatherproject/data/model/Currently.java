@@ -1,10 +1,14 @@
 package com.android.app.weatherproject.data.model;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class Currently {
 
+    private int id;
     @SerializedName("time")
     @Expose
     private Integer time;
@@ -62,6 +66,14 @@ public class Currently {
     @SerializedName("ozone")
     @Expose
     private Double ozone;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public Integer getTime() {
         return time;
