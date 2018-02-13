@@ -9,13 +9,14 @@ import android.arch.persistence.room.Query;
 import com.android.app.weatherproject.data.model.WeatherDay;
 
 import java.util.Date;
+import java.util.List;
 
 @Dao
 public interface WeatherDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void bulkInsert(WeatherDay... Weather);
+    void bulkInsert(List<WeatherDay> weatherList);
 
-    @Query("SELECT * FROM weather_daily WHERE date= :date")
+    @Query("SELECT * FROM weather_daily WHERE time= :date")
     LiveData<WeatherDay> getWeatherByDate(Date date);
 }

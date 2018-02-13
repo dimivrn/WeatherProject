@@ -8,7 +8,7 @@ import android.arch.persistence.room.PrimaryKey;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-@Entity(tableName = "weather_daily", indices = {@Index(value = {"date"}, unique = true)})
+@Entity(tableName = "weather_daily", indices = {@Index(value = {"time"}, unique = true)})
 public class WeatherDay {
 
     @PrimaryKey(autoGenerate = true)

@@ -3,11 +3,13 @@ package com.android.app.weatherproject.data.database;
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
+import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
 
 import com.android.app.weatherproject.data.model.WeatherDay;
 
 @Database(entities = {WeatherDay.class}, version = 1)
+@TypeConverters(DateConverter.class)
 public abstract class WeatherDatabase extends RoomDatabase {
 
     private static final String DATABASE_NAME = "weather";
