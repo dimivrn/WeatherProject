@@ -22,6 +22,14 @@ android {
     buildTypes.each {
         it.buildConfigField 'String', 'DARK_SKY_API_KEY', "\"d1e4f05c6095f8f0c17b532a305c5767\""
     }
+    compileOptions {
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
+    }
+
+    dataBinding {
+        enabled = true
+    }
 }
 
 dependencies {
@@ -29,13 +37,22 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:27.0.2'
-    compile 'com.android.support:support-v4:27.0.2'
-    compile 'com.squareup.okhttp3:okhttp:3.9.1'
 
+    compile "com.android.support:design:$support_version"
+    compile "com.android.support:appcompat-v7:$support_version"
+    compile "com.android.support:support-v4:$support_version"
+    compile "com.squareup.okhttp3:okhttp:$okhttp_version"
 
-    compile 'com.android.support:design:27.0.2'
-    compile 'com.google.android.gms:play-services-location:11.8.0'
+    compile 'com.squareup.retrofit2:retrofit:2.3.0'
+    compile 'com.google.code.gson:gson:2.8.2'
+    compile 'com.squareup.retrofit2:converter-gson:2.3.0'
+    compile 'com.android.support.constraint:constraint-layout:1.1.0-beta4'
 
-    testCompile 'junit:junit:4.12'
+    implementation "android.arch.lifecycle:extensions:$arch_version"
+    implementation "android.arch.persistence.room:runtime:$room_version"
+    annotationProcessor "android.arch.persistence.room:compiler:$room_version"
+
+    compile "com.google.android.gms:play-services-location:$playservices_version"
+
+    testCompile "junit:junit:$junit_version"
 }

@@ -1,83 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:minHeight="?android:listPreferredItemHeight"
-    android:gravity="center_vertical"
-    android:padding="@dimen/start_padding_parent_linear">
-
-    <ImageView
-        android:id="@+id/list_item_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    <data>
+        <variable
+            name="weatherDay"
+            type="com.android.app.weatherproject.data.model.WeatherDay" />
+        <variable
+            name="clickCallback"
+            type="com.android.app.weatherproject.ui.list.WeatherAdapter.WeatherClickListener" />
+    </data>
 
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingStart="@dimen/start_padding_nested_linear"
-        android:paddingEnd="@dimen/start_padding_nested_linear"
-        android:layout_weight="1">
-
-        <TextView
-            android:id="@+id/list_date_textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/text_size_normal"
-            android:textColor="@android:color/black"
-            tools:text="Tomorrow"/>
-
-        <TextView
-            android:id="@+id/list_summary_textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/text_size_detail"
-            tools:text="Χιονόπτωση φουλ"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:minHeight="?android:listPreferredItemHeight"
         android:orientation="horizontal"
-        android:layout_gravity="center_vertical"
-        android:layout_margin="@dimen/layout_margin">
+        android:onClick="@{() -> clickCallback.onClick(weatherDay)}"
+        android:padding="@dimen/start_padding_parent_linear">
 
-        <TextView
-            android:id="@+id/item_high_temp"
+        <ImageView
+            android:id="@+id/list_item_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/text_size_large"
-            tools:text="18"/>
+            android:src="@{weatherDay.icon}" />
 
-        <TextView
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:paddingEnd="@dimen/start_padding_nested_linear"
+            android:paddingStart="@dimen/start_padding_nested_linear">
+
+            <TextView
+                android:id="@+id/list_date_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/text_size_normal"
+                app:weatherTime="@{weatherDay.time}"/>
+
+            <TextView
+                android:id="@+id/list_summary_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{weatherDay.summary}"
+                android:textSize="@dimen/text_size_detail" />
+
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/back_slash"
-            android:textSize="@dimen/text_size_large"/>
+            android:layout_gravity="center_vertical"
+            android:layout_margin="@dimen/layout_margin"
+            android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/item_low_temp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/text_size_large"
-            tools:text="3"/>
+            <TextView
+                android:id="@+id/item_high_temp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{String.format(@string/format_temperature, weatherDay.temperatureHigh)}"
+                android:textSize="@dimen/text_size_large" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/back_slash"
+                android:textSize="@dimen/text_size_large" />
+
+            <TextView
+                android:id="@+id/item_low_temp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{String.format(@string/format_temperature, weatherDay.temperatureLow)}"
+                android:textSize="@dimen/text_size_large" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
-
-
-
-
-
-
-
-
-
-</LinearLayout>
+</layout>
 
 
 
